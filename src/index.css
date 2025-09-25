@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* Custom CSS classes */
+.custom-border {
+  border-color: oklch(var(--border)/0.5);
+}
+
 /* Global styles */
 @layer base {
   :root {
