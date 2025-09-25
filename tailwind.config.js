@@ -5,10 +5,12 @@ export default {
     {
       pattern: /border-\[.*\]/,
     },
+    'border-border',
   ],
   theme: {
     extend: {
       colors: {
+        border: "var(--border)",
         input: "var(--input)",
         ring: "var(--ring)",
         background: "var(--background)",
