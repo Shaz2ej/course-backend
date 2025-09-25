@@ -108,7 +108,7 @@ export default function DatabaseAudit() {
                 </div>
                 <div className="space-y-2">
                   {auditData.orphanedVideos.map(video => (
-                    <div key={video.id} className="bg-white p-3 rounded border-[var(--border)]">
+                    <div key={video.id} className="bg-white p-3 rounded border-gray-300">
                       <div className="font-medium">{video.title}</div>
                       <div className="text-sm text-gray-600">
                         Video ID: {video.id} | Course ID: {video.course_id || 'NULL'}
@@ -125,7 +125,7 @@ export default function DatabaseAudit() {
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">Relationship Tests</h3>
           {Object.entries(testResults).map(([test, result]) => (
-            <div key={test} className="flex items-center justify-between p-3 border-[var(--border)] rounded-lg">
+            <div key={test} className="flex items-center justify-between p-3 border-gray-300 rounded-lg">
               <div>
                 <div className="font-medium">{test.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</div>
                 <div className="text-sm text-gray-600">{result.message}</div>
