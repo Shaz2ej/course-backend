@@ -4,7 +4,6 @@ export default {
   theme: {
     extend: {
       colors: {
-        border: "var(--border)",
         input: "var(--input)",
         ring: "var(--ring)",
         background: "var(--background)",

@@ -247,7 +247,7 @@ export default function CourseDetails() {
           ) : (
             <div className="space-y-3">
               {videos.slice(0, 5).map((video, index) => (
-                <div key={video.id} className="flex items-center justify-between p-3 border rounded-lg">
+                <div key={video.id} className="flex items-center justify-between p-3 border-[var(--border)] rounded-lg">
                   <div>
                     <h4 className="font-medium">{video.title}</h4>
                     <p className="text-sm text-muted-foreground">
