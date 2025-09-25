@@ -1,0 +1,121 @@
+/* Additional CSS styles and utilities */
+
+@layer utilities {
+  /* Fix mask-repeat compatibility */
+  .mask-repeat {
+    -webkit-mask-repeat: repeat !important;
+    mask-repeat: repeat !important;
+  }
+  
+  /* Remove field-sizing for compatibility */
+  .field-sizing-content {
+    width: fit-content !important;
+    min-width: 0 !important;
+  }
+  
+  /* Fix text-wrap compatibility */
+  .text-balance {
+    text-align: left !important;
+    word-wrap: break-word !important;
+  }
+  
+  @supports (text-wrap: balance) {
+    .text-balance {
+      text-wrap: balance !important;
+      text-align: unset !important;
+    }
+  }
+}
+
+/* Performance optimized animations */
+@layer components {
+  /* Use transform instead of height for better performance */
+  @keyframes accordion-down {
+    from {
+      opacity: 0;
+      transform: scaleY(0.95) translateY(-5px);
+    }
+    to {
+      opacity: 1;
+      transform: scaleY(1) translateY(0);
+    }
+  }
+  
+  @keyframes accordion-up {
+    from {
+      opacity: 1;
+      transform: scaleY(1) translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: scaleY(0.95) translateY(-5px);
+    }
+  }
+  
+  /* Optimized slide animations */
+  @keyframes slide-down {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes slide-up {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+  }
+  
+  /* Fade animations for better performance */
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes fade-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+  
+  /* Animation utilities */
+  .animate-accordion-down {
+    animation: accordion-down 0.2s ease-out;
+  }
+  
+  .animate-accordion-up {
+    animation: accordion-up 0.2s ease-out;
+  }
+  
+  .animate-slide-down {
+    animation: slide-down 0.2s ease-out;
+  }
+  
+  .animate-slide-up {
+    animation: slide-up 0.2s ease-out;
+  }
+  
+  .animate-fade-in {
+    animation: fade-in 0.2s ease-out;
+  }
+  
+  .animate-fade-out {
+    animation: fade-out 0.2s ease-out;
+  }
+}

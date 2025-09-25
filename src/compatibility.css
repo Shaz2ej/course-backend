@@ -1,0 +1,137 @@
+/* CSS Compatibility Fixes for Tailwind CSS v4 */
+
+/* Override Tailwind's text-size-adjust utilities */
+@layer base {
+  html,
+  :host {
+    -webkit-text-size-adjust: 100% !important;
+    -ms-text-size-adjust: 100% !important;
+    -moz-text-size-adjust: 100% !important;
+    text-size-adjust: 100% !important;
+  }
+}
+
+/* Override Tailwind's mask utilities */
+@layer utilities {
+  .mask-repeat {
+    -webkit-mask-repeat: repeat !important;
+    mask-repeat: repeat !important;
+  }
+  
+  /* Replace field-sizing with compatible alternatives */
+  .field-sizing-content {
+    width: fit-content !important;
+    min-width: 0 !important;
+    /* Don't use field-sizing as it's not widely supported */
+  }
+  
+  /* Replace text-wrap: balance with fallbacks */
+  .text-balance {
+    text-align: left !important;
+    /* Remove text-wrap: balance as it's not supported in older Safari */
+  }
+  
+  /* Enhanced text-balance for supported browsers */
+  @supports (text-wrap: balance) {
+    .text-balance {
+      text-wrap: balance !important;
+      text-align: unset !important;
+    }
+  }
+}
+
+/* Additional compatibility fixes */
+@layer base {
+  /* Ensure proper text rendering across browsers */
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Fix for older browsers */
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Performance optimized animations */
+@keyframes accordion-down-optimized {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scaleY(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+  }
+}
+
+@keyframes accordion-up-optimized {
+  from {
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-4px) scaleY(0.95);
+  }
+}
+
+/* Replace height-based animations with transform-based ones */
+.accordion-down {
+  animation: accordion-down-optimized 0.2s ease-out;
+}
+
+.accordion-up {
+  animation: accordion-up-optimized 0.2s ease-out;
+}
+
+/* Smooth transitions with will-change for better performance */
+.smooth-transition {
+  will-change: transform, opacity;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+/* Remove will-change after animation to free up resources */
+.smooth-transition:not(:hover):not(:focus) {
+  will-change: auto;
+}
+
+/* Optimize commonly animated elements */
+[data-slot=\"button\"],
+.button {
+  will-change: transform;
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+[data-slot=\"button\"]:not(:hover):not(:focus),
+.button:not(:hover):not(:focus) {
+  will-change: auto;
+}
+
+/* Prevent layout thrashing */
+.prevent-layout-shift {
+  contain: layout;
+}
+
+/* Better focus styles for accessibility */
+.focus-visible-enhanced {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+.focus-visible-enhanced:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
