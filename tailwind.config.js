@@ -5,7 +5,6 @@ export default {
     {
       pattern: /border-\[.*\]/,
     },
-    'border-border',
   ],
   theme: {
     extend: {
