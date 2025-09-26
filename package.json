@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "clean": "rm -rf node_modules dist"
   },
-  "dummy_cache_breaker": "1.0.0",
+  "dummy_cache_breaker": "1.0.1",
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
     "@radix-ui/react-accordion": "^1.2.10",
