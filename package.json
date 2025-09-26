@@ -6,9 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint .",
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "clean": "rimraf node_modules dist"
+    "clean": "rm -rf node_modules dist"
   },
   "dummy_cache_breaker": "1.0.0",
   "dependencies": {
