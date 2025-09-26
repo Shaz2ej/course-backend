@@ -8,6 +8,7 @@
 /* Global styles */
 @layer base {
   :root {
+    background-color: #ffffff; /* Fallback white background */
     --radius: 0.5rem;
     /* --- CRITICAL: THESE MUST BE PRESENT AND HAVE VALID HSL VALUES --- */
     --background: 0 0% 100%;
@@ -96,12 +97,14 @@
   /* Fix text-size-adjust compatibility */
   html,
   :host {
+    background-color: #ffffff; /* Fallback white background */
     -webkit-text-size-adjust: 100% !important;
     -moz-text-size-adjust: 100% !important;
     text-size-adjust: 100% !important;
   }
   
   body {
+    background-color: #ffffff; /* Fallback white background */
     background-color: var(--background);
     color: var(--foreground);
   }
