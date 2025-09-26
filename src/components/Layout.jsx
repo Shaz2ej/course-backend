@@ -73,7 +73,7 @@ export default function Layout() {
 
       {/* Desktop sidebar */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
-        <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r bg-card px-0">
+        <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r bg-background px-0">
           <div className="flex h-16 shrink-0 items-center border-b px-6">
             <h1 className="text-lg font-semibold text-foreground">Course Admin</h1>
           </div>
