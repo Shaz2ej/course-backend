@@ -52,6 +52,23 @@
   html {
     -webkit-tap-highlight-color: transparent;
   }
+  
+  /* Ensure modal backgrounds are solid */
+  [data-slot="dialog-content"],
+  [data-slot="sheet-content"],
+  [data-slot="alert-dialog-content"] {
+    background: white !important;
+    background-color: hsl(var(--background)) !important;
+    /* Prevent background transparency */
+    opacity: 1 !important;
+  }
+  
+  /* Ensure overlay has proper opacity */
+  [data-slot="dialog-overlay"],
+  [data-slot="sheet-overlay"],
+  [data-slot="alert-dialog-overlay"] {
+    background-color: rgba(0, 0, 0, 0.5) !important;
+  }
 }
 
 /* Performance optimized animations */
@@ -98,13 +115,13 @@
 }
 
 /* Optimize commonly animated elements */
-[data-slot=\"button\"],
+[data-slot="button"],
 .button {
   will-change: transform;
   transition: transform 0.15s ease, background-color 0.15s ease;
 }
 
-[data-slot=\"button\"]:not(:hover):not(:focus),
+[data-slot="button"]:not(:hover):not(:focus),
 .button:not(:hover):not(:focus) {
   will-change: auto;
 }
