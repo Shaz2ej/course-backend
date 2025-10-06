@@ -156,7 +156,7 @@ export default function VideoForm({ video = null, courseId = null, onSuccess, tr
           
           {/* Show course info when courseId is provided */}
           {courseId && (
-            <div className="space-y-2">
+            <div className="space-y-2 mt-2 mb-4">
               <div className="p-3 bg-green-50 border border-green-200 rounded-md">
                 <p className="text-sm text-green-800">
                   ✅ This video will be added to course ID: <code className="font-mono bg-green-100 px-1 rounded">{courseId}</code>
