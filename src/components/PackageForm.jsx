@@ -4,7 +4,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { Plus, Save, X, Upload } from 'lucide-react'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { Plus, Save, X, Upload, Trash2 } from 'lucide-react'
 import { createPackage, updatePackage, getCourses, linkPackageToCourse, unlinkPackageFromCourse, uploadFile } from '@/lib/database'
 
 export default function PackageForm({ packageData = null, onSuccess, trigger }) {
@@ -71,6 +72,10 @@ export default function PackageForm({ packageData = null, onSuccess, trigger }) 
     } finally {
       setUploading(false)
     }
+  }
+
+  const handleDeleteThumbnail = () => {
+    setFormData(prev => ({ ...prev, thumbnail_url: '' }))
   }
 
   const handleCourseToggle = (courseId) => {
@@ -165,126 +170,147 @@ export default function PackageForm({ packageData = null, onSuccess, trigger }) 
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {packageData ? 'Edit Package' : 'Add New Package'}
           </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="title">Package Title</Label>
-            <Input
-              id="title"
-              value={formData.title}
-              onChange={(e) => handleInputChange('title', e.target.value)}
-              placeholder="Enter package title"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => handleInputChange('description', e.target.value)}
-              placeholder="Enter package description"
-              rows={3}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="price">Price ($)</Label>
-            <Input
-              id="price"
-              type="number"
-              step="0.01"
-              min="0"
-              value={formData.price}
-              onChange={(e) => handleInputChange('price', e.target.value)}
-              placeholder="Enter price"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="thumbnail">Thumbnail Image</Label>
-            <div className="flex flex-col gap-2">
-              <Input
-                id="thumbnail"
-                type="file"
-                accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
-                onChange={handleFileUpload}
-                disabled={uploading}
-              />
-              <p className="text-xs text-muted-foreground">
-                Upload an image file (JPEG, PNG, GIF, WebP). Max size: 10MB.
-              </p>
-              {uploading && (
-                <p className="text-sm text-blue-600">Uploading...</p>
-              )}
-              {formData.thumbnail_url && (
-                <div className="flex items-center gap-2">
-                  <img 
-                    src={formData.thumbnail_url} 
-                    alt="Thumbnail preview" 
-                    className="w-16 h-16 object-cover rounded"
-                  />
-                  <p className="text-sm text-green-600">Thumbnail uploaded successfully</p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Select Courses to Include</Label>
-            {loadingCourses ? (
-              <p className="text-sm text-muted-foreground">Loading courses...</p>
-            ) : availableCourses.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No courses available</p>
-            ) : (
-              <div className="border rounded-md p-3 max-h-48 overflow-y-auto">
-                {availableCourses.map((course) => (
-                  <div key={course.id} className="flex items-center space-x-2 py-2">
-                    <input
-                      type="checkbox"
-                      id={`course-${course.id}`}
-                      checked={selectedCourses.includes(course.id)}
-                      onChange={() => handleCourseToggle(course.id)}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                    <label 
-                      htmlFor={`course-${course.id}`} 
-                      className="text-sm font-medium cursor-pointer flex-1"
-                    >
-                      {course.title}
-                    </label>
-                  </div>
-                ))}
+        <Tabs defaultValue="details" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="details">Package Details</TabsTrigger>
+            <TabsTrigger value="courses">Included Courses</TabsTrigger>
+          </TabsList>
+          <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+            <TabsContent value="details" className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="title">Package Title</Label>
+                <Input
+                  id="title"
+                  value={formData.title}
+                  onChange={(e) => handleInputChange('title', e.target.value)}
+                  placeholder="Enter package title"
+                  required
+                />
               </div>
-            )}
-            <p className="text-xs text-muted-foreground">
-              Select which courses should be included in this package
-            </p>
-          </div>
 
-          <div className="flex justify-end space-x-2 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setOpen(false)}
-              disabled={loading}
-            >
-              <X className="mr-2 h-4 w-4" />
-              Cancel
-            </Button>
-            <Button type="submit" disabled={loading || uploading}>
-              <Save className="mr-2 h-4 w-4" />
-              {loading ? 'Saving...' : (packageData ? 'Update' : 'Create')}
-            </Button>
-          </div>
-        </form>
+              <div className="space-y-2">
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) => handleInputChange('description', e.target.value)}
+                  placeholder="Enter package description"
+                  rows={3}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="price">Price ($)</Label>
+                <Input
+                  id="price"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={formData.price}
+                  onChange={(e) => handleInputChange('price', e.target.value)}
+                  placeholder="Enter price"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="thumbnail">Thumbnail Image</Label>
+                <div className="flex flex-col gap-2">
+                  <Input
+                    id="thumbnail"
+                    type="file"
+                    accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                    onChange={handleFileUpload}
+                    disabled={uploading}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Upload an image file (JPEG, PNG, GIF, WebP). Max size: 10MB.
+                  </p>
+                  {uploading && (
+                    <p className="text-sm text-blue-600">Uploading...</p>
+                  )}
+                  {formData.thumbnail_url && (
+                    <div className="flex items-center gap-2">
+                      <img 
+                        src={formData.thumbnail_url} 
+                        alt="Thumbnail preview" 
+                        className="w-16 h-16 object-cover rounded"
+                      />
+                      <div className="flex flex-col">
+                        <p className="text-sm text-green-600">Thumbnail uploaded successfully</p>
+                        <Button 
+                          type="button"
+                          variant="outline" 
+                          size="sm" 
+                          className="w-fit mt-1"
+                          onClick={handleDeleteThumbnail}
+                        >
+                          <Trash2 className="mr-1 h-3 w-3" />
+                          Delete Thumbnail
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </TabsContent>
+            <TabsContent value="courses" className="space-y-4">
+              <div className="space-y-2">
+                <Label>Select Courses to Include</Label>
+                {loadingCourses ? (
+                  <p className="text-sm text-muted-foreground">Loading courses...</p>
+                ) : availableCourses.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">No courses available</p>
+                ) : (
+                  <div className="border rounded-md p-3 max-h-64 overflow-y-auto">
+                    {availableCourses.map((course) => (
+                      <div key={course.id} className="flex items-center space-x-2 py-2">
+                        <input
+                          type="checkbox"
+                          id={`course-${course.id}`}
+                          checked={selectedCourses.includes(course.id)}
+                          onChange={() => handleCourseToggle(course.id)}
+                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <label 
+                          htmlFor={`course-${course.id}`} 
+                          className="text-sm font-medium cursor-pointer flex-1"
+                        >
+                          {course.title}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <p className="text-xs text-muted-foreground">
+                  Select which courses should be included in this package
+                </p>
+              </div>
+            </TabsContent>
+
+            <div className="flex justify-end space-x-2 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOpen(false)}
+                disabled={loading}
+              >
+                <X className="mr-2 h-4 w-4" />
+                Cancel
+              </Button>
+              <Button type="submit" disabled={loading || uploading}>
+                <Save className="mr-2 h-4 w-4" />
+                {loading ? 'Saving...' : (packageData ? 'Update' : 'Create')}
+              </Button>
+            </div>
+          </form>
+        </Tabs>
       </DialogContent>
     </Dialog>
   )
