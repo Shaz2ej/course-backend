@@ -9,6 +9,7 @@ import Courses from './pages/Courses'
 import CourseDetails from './pages/CourseDetails'
 import CourseVideos from './pages/CourseVideos'
 import Analytics from './pages/Analytics'
+import PackageReferralCodes from './pages/PackageReferralCodes'
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="courses/:id" element={<CourseDetails />} />
           <Route path="courses/:id/videos" element={<CourseVideos />} />
           <Route path="analytics" element={<Analytics />} />
+          <Route path="package-referral-codes" element={<PackageReferralCodes />} />
         </Route>
       </Routes>
     </Router>
@@ -31,4 +33,3 @@ function App() {
 }
 
 export default App
-

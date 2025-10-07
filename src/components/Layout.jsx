@@ -9,7 +9,8 @@ import {
   BookOpen, 
   Menu, 
   X,
-  BarChart3
+  BarChart3,
+  Gift
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
@@ -21,6 +22,7 @@ const navigation = [
   { name: 'Withdrawals', href: '/withdrawals', icon: CreditCard },
   { name: 'Packages', href: '/packages', icon: Package },
   { name: 'Courses', href: '/courses', icon: BookOpen },
+  { name: 'Package Referral Codes', href: '/package-referral-codes', icon: Gift },
   { name: 'Analytics', href: '/analytics', icon: BarChart3 },
 ]
 
@@ -122,4 +124,3 @@ export default function Layout() {
     </div>
   )
 }
-

@@ -1138,3 +1138,38 @@ export const auditVideoRelationships = async () => {
   }
 }
 
+/**
+ * Get referral code data for package-based referrals
+ * Joins students, purchases, and packages tables to show referral information
+ */
+export const getPackageReferralCodes = async () => {
+  try {
+    // Get purchases with student and package information
+    const { data, error } = await supabase
+      .from('purchases')
+      .select(`
+        id,
+        created_at,
+        students(id, name, email, referral_code),
+        packages(id, title)
+      `)
+      .order('created_at', { ascending: false })
+    
+    if (error) throw error
+    
+    // Transform data to match required format
+    const referralData = data?.map(purchase => ({
+      id: purchase.id,
+      student_name: purchase.students?.name || 'Unknown Student',
+      student_email: purchase.students?.email || 'Unknown Email',
+      package_name: purchase.packages?.title || 'Unknown Package',
+      referral_code: purchase.students?.referral_code || 'No Referral Code',
+      created_at: purchase.created_at
+    })) || []
+    
+    return referralData
+  } catch (error) {
+    console.error('Error fetching package referral codes:', error)
+    throw error
+  }
+}
