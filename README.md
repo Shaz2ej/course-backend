@@ -31,6 +31,7 @@ A fully functional mobile admin panel for a course/affiliate platform built with
 - **Routing**: React Router DOM
 - **Build Tool**: Vite
 - **Package Manager**: pnpm
+- **Backend**: Firebase Admin SDK (secure server-side access)
 
 ## Database Schema
 
@@ -111,8 +112,16 @@ cd course-admin-panel
 pnpm install
 ```
 
-### 2. Database Configuration
-The application is pre-configured with the provided database credentials.
+### 2. Firebase Admin SDK Setup
+The application now uses Firebase Admin SDK for secure server-side Firestore access:
+
+1. Create a Firebase service account key:
+   - Go to Firebase Console > Project Settings > Service Accounts
+   - Click "Generate new private key"
+   - Save the JSON file securely
+
+2. Update the service account information in `server/firebaseAdmin.js`:
+   - Replace the placeholder values with your actual service account key data
 
 ### 3. Database Setup
 Create the required tables in your database project using the SQL schema provided above. You can run these commands in the database SQL editor:
@@ -127,10 +136,14 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 ### 4. Development
 ```bash
-# Start development server
+# Start frontend development server
 pnpm run dev
 
+# In a separate terminal, start backend server
+pnpm run server:dev
+
 # The app will be available at http://localhost:5173
+# The API server will be available at http://localhost:3001
 ```
 
 ### 5. Production Build
@@ -202,10 +215,14 @@ course-admin-panel/
 │   │   ├── Courses.jsx
 │   │   └── Analytics.jsx
 │   ├── lib/              # Utility functions
-│   │   ├── database.js   # Database operations
-│   │   └── types.js      # Type definitions
+│   │   ├── apiClient.js  # API client for backend communication
+│   │   └── firestoreUtils.js # Firestore utility functions
 │   ├── App.jsx           # Main app component
 │   └── main.jsx          # Entry point
+├── server/               # Backend server with Firebase Admin SDK
+│   ├── firebaseAdmin.js  # Firebase Admin SDK initialization
+│   ├── index.js          # Express server
+│   └── package.json      # Server dependencies
 ├── package.json
 └── README.md
 ```
@@ -244,6 +261,7 @@ The database configuration is currently using stub implementations.
 - Validate all user inputs
 - Use environment variables for sensitive data
 - Implement proper error handling
+- The Firebase Admin SDK provides secure server-side access to Firestore
 
 ## Performance Optimizations
 

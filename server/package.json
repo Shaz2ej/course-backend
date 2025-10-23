@@ -1,0 +1,28 @@
+{
+  "name": "course-admin-panel-server",
+  "version": "1.0.0",
+  "description": "Backend server for course admin panel with Firebase Admin SDK",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "firebase-admin": "^11.10.1",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [
+    "firebase",
+    "admin",
+    "express",
+    "course",
+    "admin-panel"
+  ],
+  "author": "Shaz2ej",
+  "license": "MIT"
+}

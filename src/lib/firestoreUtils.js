@@ -1,37 +1,14 @@
-import { db } from './firebase';
-import { 
-  collection, 
-  doc, 
-  getDocs, 
-  getDoc, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc,
-  Timestamp
-} from 'firebase/firestore';
+import { studentsApi, packagesApi, coursesApi, videosApi, purchasesApi } from './apiClient';
 
-// Utility function to convert Firestore timestamp to JavaScript Date
+// Utility function to convert timestamp to JavaScript Date
 export const convertTimestamp = (timestamp) => {
-  if (timestamp instanceof Timestamp) {
-    return timestamp.toDate().toISOString();
-  }
   return timestamp;
 };
 
 // Students CRUD operations
 export const getStudents = async () => {
   try {
-    const querySnapshot = await getDocs(collection(db, 'students'));
-    const students = [];
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      students.push({
-        id: doc.id,
-        ...data,
-        created_at: convertTimestamp(data.created_at)
-      });
-    });
-    return students;
+    return await studentsApi.getAll();
   } catch (error) {
     console.error('Error fetching students:', error);
     throw error;
@@ -40,18 +17,7 @@ export const getStudents = async () => {
 
 export const getStudentById = async (id) => {
   try {
-    const docRef = doc(db, 'students', id);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-      return {
-        id: docSnap.id,
-        ...data,
-        created_at: convertTimestamp(data.created_at)
-      };
-    } else {
-      return null;
-    }
+    return await studentsApi.getById(id);
   } catch (error) {
     console.error('Error fetching student:', error);
     throw error;
@@ -60,12 +26,7 @@ export const getStudentById = async (id) => {
 
 export const createStudent = async (studentData) => {
   try {
-    const dataToSave = {
-      ...studentData,
-      created_at: Timestamp.now()
-    };
-    const docRef = await addDoc(collection(db, 'students'), dataToSave);
-    return { id: docRef.id, ...dataToSave, created_at: convertTimestamp(dataToSave.created_at) };
+    return await studentsApi.create(studentData);
   } catch (error) {
     console.error('Error creating student:', error);
     throw error;
@@ -74,9 +35,7 @@ export const createStudent = async (studentData) => {
 
 export const updateStudent = async (id, updates) => {
   try {
-    const docRef = doc(db, 'students', id);
-    await updateDoc(docRef, updates);
-    return { id, ...updates };
+    return await studentsApi.update(id, updates);
   } catch (error) {
     console.error('Error updating student:', error);
     throw error;
@@ -85,7 +44,7 @@ export const updateStudent = async (id, updates) => {
 
 export const deleteStudent = async (id) => {
   try {
-    await deleteDoc(doc(db, 'students', id));
+    return await studentsApi.delete(id);
   } catch (error) {
     console.error('Error deleting student:', error);
     throw error;
@@ -95,17 +54,7 @@ export const deleteStudent = async (id) => {
 // Packages CRUD operations
 export const getPackages = async () => {
   try {
-    const querySnapshot = await getDocs(collection(db, 'packages'));
-    const packages = [];
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      packages.push({
-        id: doc.id,
-        ...data,
-        created_at: convertTimestamp(data.created_at)
-      });
-    });
-    return packages;
+    return await packagesApi.getAll();
   } catch (error) {
     console.error('Error fetching packages:', error);
     throw error;
@@ -114,18 +63,7 @@ export const getPackages = async () => {
 
 export const getPackageById = async (id) => {
   try {
-    const docRef = doc(db, 'packages', id);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-      return {
-        id: docSnap.id,
-        ...data,
-        created_at: convertTimestamp(data.created_at)
-      };
-    } else {
-      return null;
-    }
+    return await packagesApi.getById(id);
   } catch (error) {
     console.error('Error fetching package:', error);
     throw error;
@@ -134,12 +72,7 @@ export const getPackageById = async (id) => {
 
 export const createPackage = async (packageData) => {
   try {
-    const dataToSave = {
-      ...packageData,
-      created_at: Timestamp.now()
-    };
-    const docRef = await addDoc(collection(db, 'packages'), dataToSave);
-    return { id: docRef.id, ...dataToSave, created_at: convertTimestamp(dataToSave.created_at) };
+    return await packagesApi.create(packageData);
   } catch (error) {
     console.error('Error creating package:', error);
     throw error;
@@ -148,9 +81,7 @@ export const createPackage = async (packageData) => {
 
 export const updatePackage = async (id, updates) => {
   try {
-    const docRef = doc(db, 'packages', id);
-    await updateDoc(docRef, updates);
-    return { id, ...updates };
+    return await packagesApi.update(id, updates);
   } catch (error) {
     console.error('Error updating package:', error);
     throw error;
@@ -159,7 +90,7 @@ export const updatePackage = async (id, updates) => {
 
 export const deletePackage = async (id) => {
   try {
-    await deleteDoc(doc(db, 'packages', id));
+    return await packagesApi.delete(id);
   } catch (error) {
     console.error('Error deleting package:', error);
     throw error;
@@ -169,17 +100,7 @@ export const deletePackage = async (id) => {
 // Courses CRUD operations (as subcollection of packages)
 export const getCoursesByPackageId = async (packageId) => {
   try {
-    const querySnapshot = await getDocs(collection(db, 'packages', packageId, 'courses'));
-    const courses = [];
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      courses.push({
-        id: doc.id,
-        ...data,
-        created_at: convertTimestamp(data.created_at)
-      });
-    });
-    return courses;
+    return await coursesApi.getByPackageId(packageId);
   } catch (error) {
     console.error('Error fetching courses:', error);
     throw error;
@@ -188,12 +109,7 @@ export const getCoursesByPackageId = async (packageId) => {
 
 export const createCourseInPackage = async (packageId, courseData) => {
   try {
-    const dataToSave = {
-      ...courseData,
-      created_at: Timestamp.now()
-    };
-    const docRef = await addDoc(collection(db, 'packages', packageId, 'courses'), dataToSave);
-    return { id: docRef.id, ...dataToSave, created_at: convertTimestamp(dataToSave.created_at) };
+    return await coursesApi.create(packageId, courseData);
   } catch (error) {
     console.error('Error creating course:', error);
     throw error;
@@ -202,9 +118,7 @@ export const createCourseInPackage = async (packageId, courseData) => {
 
 export const updateCourseInPackage = async (packageId, courseId, updates) => {
   try {
-    const docRef = doc(db, 'packages', packageId, 'courses', courseId);
-    await updateDoc(docRef, updates);
-    return { id: courseId, ...updates };
+    return await coursesApi.update(packageId, courseId, updates);
   } catch (error) {
     console.error('Error updating course:', error);
     throw error;
@@ -213,7 +127,7 @@ export const updateCourseInPackage = async (packageId, courseId, updates) => {
 
 export const deleteCourseFromPackage = async (packageId, courseId) => {
   try {
-    await deleteDoc(doc(db, 'packages', packageId, 'courses', courseId));
+    return await coursesApi.delete(packageId, courseId);
   } catch (error) {
     console.error('Error deleting course:', error);
     throw error;
@@ -223,17 +137,7 @@ export const deleteCourseFromPackage = async (packageId, courseId) => {
 // Videos CRUD operations (as subcollection of courses)
 export const getVideosByCourseId = async (packageId, courseId) => {
   try {
-    const querySnapshot = await getDocs(collection(db, 'packages', packageId, 'courses', courseId, 'videos'));
-    const videos = [];
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      videos.push({
-        id: doc.id,
-        ...data,
-        created_at: convertTimestamp(data.created_at)
-      });
-    });
-    return videos;
+    return await videosApi.getByCourseId(packageId, courseId);
   } catch (error) {
     console.error('Error fetching videos:', error);
     throw error;
@@ -242,12 +146,7 @@ export const getVideosByCourseId = async (packageId, courseId) => {
 
 export const createVideoInCourse = async (packageId, courseId, videoData) => {
   try {
-    const dataToSave = {
-      ...videoData,
-      created_at: Timestamp.now()
-    };
-    const docRef = await addDoc(collection(db, 'packages', packageId, 'courses', courseId, 'videos'), dataToSave);
-    return { id: docRef.id, ...dataToSave, created_at: convertTimestamp(dataToSave.created_at) };
+    return await videosApi.create(packageId, courseId, videoData);
   } catch (error) {
     console.error('Error creating video:', error);
     throw error;
@@ -256,9 +155,7 @@ export const createVideoInCourse = async (packageId, courseId, videoData) => {
 
 export const updateVideoInCourse = async (packageId, courseId, videoId, updates) => {
   try {
-    const docRef = doc(db, 'packages', packageId, 'courses', courseId, 'videos', videoId);
-    await updateDoc(docRef, updates);
-    return { id: videoId, ...updates };
+    return await videosApi.update(packageId, courseId, videoId, updates);
   } catch (error) {
     console.error('Error updating video:', error);
     throw error;
@@ -267,7 +164,7 @@ export const updateVideoInCourse = async (packageId, courseId, videoId, updates)
 
 export const deleteVideoFromCourse = async (packageId, courseId, videoId) => {
   try {
-    await deleteDoc(doc(db, 'packages', packageId, 'courses', courseId, 'videos', videoId));
+    return await videosApi.delete(packageId, courseId, videoId);
   } catch (error) {
     console.error('Error deleting video:', error);
     throw error;
@@ -277,18 +174,7 @@ export const deleteVideoFromCourse = async (packageId, courseId, videoId) => {
 // Purchases CRUD operations
 export const getPurchases = async () => {
   try {
-    const querySnapshot = await getDocs(collection(db, 'purchases'));
-    const purchases = [];
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      purchases.push({
-        id: doc.id,
-        ...data,
-        created_at: convertTimestamp(data.created_at),
-        purchase_date: convertTimestamp(data.purchase_date)
-      });
-    });
-    return purchases;
+    return await purchasesApi.getAll();
   } catch (error) {
     console.error('Error fetching purchases:', error);
     throw error;
@@ -297,13 +183,7 @@ export const getPurchases = async () => {
 
 export const createPurchase = async (purchaseData) => {
   try {
-    const dataToSave = {
-      ...purchaseData,
-      purchase_date: Timestamp.now(),
-      created_at: Timestamp.now()
-    };
-    const docRef = await addDoc(collection(db, 'purchases'), dataToSave);
-    return { id: docRef.id, ...dataToSave, created_at: convertTimestamp(dataToSave.created_at) };
+    return await purchasesApi.create(purchaseData);
   } catch (error) {
     console.error('Error creating purchase:', error);
     throw error;
@@ -312,9 +192,7 @@ export const createPurchase = async (purchaseData) => {
 
 export const updatePurchase = async (id, updates) => {
   try {
-    const docRef = doc(db, 'purchases', id);
-    await updateDoc(docRef, updates);
-    return { id, ...updates };
+    return await purchasesApi.update(id, updates);
   } catch (error) {
     console.error('Error updating purchase:', error);
     throw error;
