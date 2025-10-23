@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -6,6 +6,8 @@ import { Badge } from '@/components/ui/badge'
 import { ArrowLeft, Edit, Play, Plus, Trash2 } from 'lucide-react'
 import CourseForm from '@/components/CourseForm'
 import VideoForm from '@/components/VideoForm'
+import { db } from '@/lib/firebase'
+import { doc, getDoc, deleteDoc, collection, getDocs } from 'firebase/firestore'
 
 export default function CourseDetails() {
   const { id } = useParams()
@@ -15,50 +17,74 @@ export default function CourseDetails() {
   const [loading, setLoading] = useState(true)
   const [videosLoading, setVideosLoading] = useState(true)
 
-  const fetchCourse = async () => {
+  const fetchCourse = useCallback(async () => {
     try {
       setLoading(true)
-      // Stub implementation - replace with actual database call
-      console.warn('Database functionality removed - getCourses not implemented')
-      await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
+      // We need to find the course across all packages since we only have the course ID
+      // In a real implementation, you might want to pass the packageId as well
+      const packagesSnapshot = await getDocs(collection(db, 'packages'))
+      let foundCourse = null
+      let foundPackageId = null
       
-      // Mock course data
-      const mockCourse = {
-        id: id,
-        title: 'Sample Course',
-        description: 'This is a sample course description.',
-        created_at: new Date().toISOString()
+      for (const packageDoc of packagesSnapshot.docs) {
+        const courseDoc = await getDoc(doc(db, 'packages', packageDoc.id, 'courses', id))
+        if (courseDoc.exists()) {
+          foundCourse = { id: courseDoc.id, ...courseDoc.data() }
+          foundPackageId = packageDoc.id
+          break
+        }
       }
-      setCourse(mockCourse)
+      
+      if (foundCourse) {
+        setCourse({
+          ...foundCourse,
+          packageId: foundPackageId,
+          created_at: foundCourse.created_at?.toDate ? foundCourse.created_at.toDate().toISOString() : new Date().toISOString()
+        })
+      } else {
+        navigate('/courses') // Redirect if course not found
+      }
     } catch (error) {
       console.error('Error fetching course:', error)
       navigate('/courses')
     } finally {
       setLoading(false)
     }
-  }
+  }, [id, navigate])
 
-  const fetchVideos = async () => {
+  const fetchVideos = useCallback(async () => {
     try {
       setVideosLoading(true)
-      // Stub implementation - replace with actual database call
-      console.warn('Database functionality removed - getCourseVideos not implemented')
-      await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
-      
-      // Mock videos data
-      setVideos([])
+      if (course?.packageId) {
+        const videosSnapshot = await getDocs(collection(db, 'packages', course.packageId, 'courses', id, 'videos'))
+        const videosData = []
+        videosSnapshot.forEach((videoDoc) => {
+          const videoData = videoDoc.data()
+          videosData.push({
+            id: videoDoc.id,
+            ...videoData,
+            created_at: videoData.created_at?.toDate ? videoData.created_at.toDate().toISOString() : new Date().toISOString()
+          })
+        })
+        setVideos(videosData)
+      }
     } catch (error) {
       console.error('Error fetching videos:', error)
       setVideos([])
     } finally {
       setVideosLoading(false)
     }
-  }
+  }, [course?.packageId, id])
 
   useEffect(() => {
     fetchCourse()
-    fetchVideos()
-  }, [id])
+  }, [id, fetchCourse])
+
+  useEffect(() => {
+    if (course) {
+      fetchVideos()
+    }
+  }, [course, fetchVideos])
 
   const handleFormSuccess = () => {
     fetchCourse()
@@ -67,13 +93,10 @@ export default function CourseDetails() {
 
   const handleDeleteCourse = async () => {
     try {
-      // Stub implementation - replace with actual database call
-      console.warn('Database functionality removed - checkCourseDependencies/deleteCourse not implemented')
-      await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
-      
-      if (confirm(`Are you sure you want to delete this course?`)) {
+      if (confirm(`Are you sure you want to delete "${course.title}"?`)) {
+        await deleteDoc(doc(db, 'packages', course.packageId, 'courses', id))
         navigate('/courses')
-        alert('Course would have been deleted!')
+        alert('Course deleted successfully!')
       }
     } catch (error) {
       console.error('Error deleting course:', error)

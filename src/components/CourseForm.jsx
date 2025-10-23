@@ -5,8 +5,10 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Plus, Save, X } from 'lucide-react'
+import { db } from '@/lib/firebase'
+import { collection, addDoc, updateDoc, doc, Timestamp } from 'firebase/firestore'
 
-export default function CourseForm({ course = null, onSuccess, trigger }) {
+export default function CourseForm({ course = null, onSuccess, trigger, packageId }) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
@@ -21,18 +23,30 @@ export default function CourseForm({ course = null, onSuccess, trigger }) {
     try {
       const courseData = {
         title: formData.title,
-        description: formData.description
+        description: formData.description,
+        created_at: Timestamp.now()
       }
 
-      // Stub implementation - replace with actual database call
-      console.warn('Database functionality removed - course operation not implemented')
-      await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
+      if (course) {
+        // Update existing course
+        const courseRef = doc(db, 'packages', course.packageId, 'courses', course.id)
+        await updateDoc(courseRef, courseData)
+      } else {
+        // Create new course - we need a packageId to create a course
+        if (!packageId) {
+          alert('Package ID is required to create a course')
+          setLoading(false)
+          return
+        }
+        const coursesRef = collection(db, 'packages', packageId, 'courses')
+        await addDoc(coursesRef, courseData)
+      }
 
       setOpen(false)
       setFormData({ title: '', description: '' })
       onSuccess?.()
       
-      alert(`Course would have been ${course ? 'updated' : 'created'}!`)
+      alert(`Course ${course ? 'updated' : 'created'} successfully!`)
     } catch (error) {
       console.error('Error saving course:', error)
       alert('Error saving course. Please try again.')

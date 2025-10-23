@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Search } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
+import { db } from '@/lib/firebase'
+import { collection, getDocs, doc, getDoc } from 'firebase/firestore'
 
 export default function PackageReferralCodes() {
   const [referralCodes, setReferralCodes] = useState([])
@@ -12,29 +14,73 @@ export default function PackageReferralCodes() {
   useEffect(() => {
     const fetchReferralCodes = async () => {
       try {
-        // Stub implementation - replace with actual database call
-        console.warn('Database functionality removed - getPackageReferralCodes not implemented')
-        await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
+        setLoading(true)
+        // In a real implementation, you might have a separate collection for referral codes
+        // For now, we'll generate this data from purchases that have affiliate information
+        const purchasesSnapshot = await getDocs(collection(db, 'purchases'))
+        const referralCodesData = []
         
-        // Mock referral codes data
-        setReferralCodes([
-          {
-            id: '1',
-            student_name: 'John Doe',
-            student_email: 'john@example.com',
-            package_name: 'Basic Course Package',
-            referral_code: 'JD001',
-            created_at: new Date().toISOString()
-          },
-          {
-            id: '2',
-            student_name: 'Jane Smith',
-            student_email: 'jane@example.com',
-            package_name: 'Premium Course Package',
-            referral_code: 'JS002',
-            created_at: new Date().toISOString()
+        for (const purchaseDoc of purchasesSnapshot.docs) {
+          const purchaseData = purchaseDoc.data()
+          
+          // Only include purchases with affiliate information
+          if (purchaseData.affiliate_id && purchaseData.status === 'completed') {
+            // Fetch student data
+            let studentData = null
+            if (purchaseData.student_id) {
+              try {
+                const studentDoc = await getDoc(doc(db, 'students', purchaseData.student_id))
+                if (studentDoc.exists()) {
+                  studentData = { id: studentDoc.id, ...studentDoc.data() }
+                }
+              } catch (error) {
+                console.warn('Error fetching student data:', error)
+              }
+            }
+            
+            // Fetch package data
+            let packageData = null
+            if (purchaseData.package_id) {
+              try {
+                const packagesSnapshot = await getDocs(collection(db, 'packages'))
+                for (const packageDoc of packagesSnapshot.docs) {
+                  if (packageDoc.id === purchaseData.package_id) {
+                    packageData = { id: packageDoc.id, ...packageDoc.data() }
+                    break
+                  }
+                }
+              } catch (error) {
+                console.warn('Error fetching package data:', error)
+              }
+            }
+            
+            // Fetch referrer data
+            let referrerData = null
+            if (purchaseData.affiliate_id) {
+              try {
+                const referrerDoc = await getDoc(doc(db, 'students', purchaseData.affiliate_id))
+                if (referrerDoc.exists()) {
+                  referrerData = { id: referrerDoc.id, ...referrerDoc.data() }
+                }
+              } catch (error) {
+                console.warn('Error fetching referrer data:', error)
+              }
+            }
+            
+            if (studentData && packageData && referrerData) {
+              referralCodesData.push({
+                id: purchaseDoc.id,
+                student_name: studentData.name,
+                student_email: studentData.email,
+                package_name: packageData.title,
+                referral_code: referrerData.referral_code,
+                created_at: purchaseData.purchase_date?.toDate ? purchaseData.purchase_date.toDate().toISOString() : new Date().toISOString()
+              })
+            }
           }
-        ])
+        }
+        
+        setReferralCodes(referralCodesData)
       } catch (error) {
         console.error('Error fetching referral codes:', error)
         setReferralCodes([])

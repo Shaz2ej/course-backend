@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Search, UserCheck, UserX } from 'lucide-react'
+import { db } from '@/lib/firebase'
+import { collection, getDocs } from 'firebase/firestore'
 
 export default function Purchases() {
   const [purchases, setPurchases] = useState([])
@@ -12,49 +14,80 @@ export default function Purchases() {
   useEffect(() => {
     const fetchPurchases = async () => {
       try {
-        // Stub implementation - replace with actual database call
-        console.warn('Database functionality removed - getPurchases not implemented')
-        await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
+        setLoading(true)
+        const purchasesSnapshot = await getDocs(collection(db, 'purchases'))
+        const purchasesData = []
         
-        // Mock purchases data
-        setPurchases([
-          {
-            id: '1',
-            amount: 49.99,
-            status: 'completed',
-            commission: 4.99,
-            created_at: new Date().toISOString(),
-            students: {
-              name: 'John Doe',
-              email: 'john@example.com'
-            },
-            packages: {
-              title: 'Basic Course Package',
-              price: 49.99
-            },
-            affiliate_id: null
-          },
-          {
-            id: '2',
-            amount: 99.99,
-            status: 'completed',
-            commission: 9.99,
-            created_at: new Date().toISOString(),
-            students: {
-              name: 'Jane Smith',
-              email: 'jane@example.com'
-            },
-            packages: {
-              title: 'Premium Course Package',
-              price: 99.99
-            },
-            affiliate_id: '1',
-            referrer: {
-              name: 'Bob Johnson',
-              email: 'bob@example.com'
+        for (const purchaseDoc of purchasesSnapshot.docs) {
+          const purchaseData = purchaseDoc.data()
+          
+          // Fetch related student data
+          let studentData = null
+          if (purchaseData.student_id) {
+            try {
+              const studentDoc = await getDocs(collection(db, 'students'))
+              studentDoc.forEach((doc) => {
+                if (doc.id === purchaseData.student_id) {
+                  studentData = { id: doc.id, ...doc.data() }
+                }
+              })
+            } catch (error) {
+              console.warn('Error fetching student data:', error)
             }
           }
-        ])
+          
+          // Fetch related package data
+          let packageData = null
+          if (purchaseData.package_id) {
+            try {
+              const packagesSnapshot = await getDocs(collection(db, 'packages'))
+              for (const packageDoc of packagesSnapshot.docs) {
+                if (packageDoc.id === purchaseData.package_id) {
+                  packageData = { id: packageDoc.id, ...packageDoc.data() }
+                  break
+                }
+              }
+            } catch (error) {
+              console.warn('Error fetching package data:', error)
+            }
+          }
+          
+          // Fetch referrer data if it's a referral purchase
+          let referrerData = null
+          if (purchaseData.affiliate_id) {
+            try {
+              const studentDoc = await getDocs(collection(db, 'students'))
+              studentDoc.forEach((doc) => {
+                if (doc.id === purchaseData.affiliate_id) {
+                  referrerData = { id: doc.id, ...doc.data() }
+                }
+              })
+            } catch (error) {
+              console.warn('Error fetching referrer data:', error)
+            }
+          }
+          
+          purchasesData.push({
+            id: purchaseDoc.id,
+            ...purchaseData,
+            students: studentData ? {
+              name: studentData.name,
+              email: studentData.email
+            } : null,
+            packages: packageData ? {
+              title: packageData.title,
+              price: packageData.price
+            } : null,
+            referrer: referrerData ? {
+              name: referrerData.name,
+              email: referrerData.email
+            } : null,
+            created_at: purchaseData.created_at?.toDate ? purchaseData.created_at.toDate().toISOString() : new Date().toISOString(),
+            purchase_date: purchaseData.purchase_date?.toDate ? purchaseData.purchase_date.toDate().toISOString() : new Date().toISOString()
+          })
+        }
+        
+        setPurchases(purchasesData)
       } catch (error) {
         console.error('Error fetching purchases:', error)
         setPurchases([])
@@ -70,7 +103,7 @@ export default function Purchases() {
     purchase.students?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     purchase.packages?.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     purchase.status?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    purchase.referrer?.name?.toLowerCase().includes(searchTerm.toLowerCase())
+    (purchase.referrer?.name && purchase.referrer?.name?.toLowerCase().includes(searchTerm.toLowerCase()))
   )
 
   const getStatusColor = (status) => {

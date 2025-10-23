@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Plus, Save, X } from 'lucide-react'
+import { createStudent, updateStudent } from '@/lib/firestoreUtils'
 
 export default function StudentForm({ student = null, onSuccess, trigger }) {
   const [open, setOpen] = useState(false)
@@ -31,9 +32,11 @@ export default function StudentForm({ student = null, onSuccess, trigger }) {
         referral_code: formData.referral_code || generateReferralCode()
       }
 
-      // Stub implementation - replace with actual database call
-      console.warn('Database functionality removed - student operation not implemented')
-      await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
+      if (student) {
+        await updateStudent(student.id, dataToSubmit)
+      } else {
+        await createStudent(dataToSubmit)
+      }
 
       setOpen(false)
       setFormData({ name: '', email: '', phone: '', referral_code: '' })

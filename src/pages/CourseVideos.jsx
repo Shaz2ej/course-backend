@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -6,6 +6,8 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { ArrowLeft, Search, Plus, Edit, Trash2, Play } from 'lucide-react'
 import VideoForm from '@/components/VideoForm'
+import { db } from '@/lib/firebase'
+import { doc, getDoc, deleteDoc, collection, getDocs } from 'firebase/firestore'
 
 export default function CourseVideos() {
   const { id } = useParams()
@@ -15,23 +17,47 @@ export default function CourseVideos() {
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
 
-  const fetchCourseAndVideos = async () => {
+  const fetchCourseAndVideos = useCallback(async () => {
     try {
       setLoading(true)
       
-      // Stub implementation - replace with actual database calls
-      console.warn('Database functionality removed - getCourseById/getCourseVideos not implemented')
-      await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
+      // We need to find the course and its package to fetch videos
+      const packagesSnapshot = await getDocs(collection(db, 'packages'))
+      let foundCourse = null
+      let foundPackageId = null
       
-      // Mock course data
-      const courseData = {
-        id: id,
-        title: 'Sample Course'
+      for (const packageDoc of packagesSnapshot.docs) {
+        const courseDoc = await getDoc(doc(db, 'packages', packageDoc.id, 'courses', id))
+        if (courseDoc.exists()) {
+          foundCourse = { id: courseDoc.id, ...courseDoc.data() }
+          foundPackageId = packageDoc.id
+          break
+        }
       }
-      setCourse(courseData)
       
-      // Mock videos data
-      setVideos([])
+      if (!foundCourse) {
+        throw new Error('Course not found')
+      }
+      
+      setCourse({
+        ...foundCourse,
+        packageId: foundPackageId,
+        title: foundCourse.title,
+        created_at: foundCourse.created_at?.toDate ? foundCourse.created_at.toDate().toISOString() : new Date().toISOString()
+      })
+      
+      // Fetch course videos
+      const videosSnapshot = await getDocs(collection(db, 'packages', foundPackageId, 'courses', id, 'videos'))
+      const videosData = []
+      videosSnapshot.forEach((videoDoc) => {
+        const videoData = videoDoc.data()
+        videosData.push({
+          id: videoDoc.id,
+          ...videoData,
+          created_at: videoData.created_at?.toDate ? videoData.created_at.toDate().toISOString() : new Date().toISOString()
+        })
+      })
+      setVideos(videosData)
     } catch (error) {
       console.error('Error fetching course data:', error)
       alert('Error loading course data. Please try again.')
@@ -39,13 +65,13 @@ export default function CourseVideos() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [id, navigate])
 
   useEffect(() => {
     if (id) {
       fetchCourseAndVideos()
     }
-  }, [id])
+  }, [id, fetchCourseAndVideos])
 
   const handleFormSuccess = () => {
     fetchCourseAndVideos() // Refresh the data
@@ -54,11 +80,9 @@ export default function CourseVideos() {
   const handleDeleteVideo = async (video) => {
     if (confirm(`Are you sure you want to delete "${video.title}"?`)) {
       try {
-        // Stub implementation - replace with actual database call
-        console.warn('Database functionality removed - deleteCourseVideo not implemented')
-        await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
+        await deleteDoc(doc(db, 'packages', course.packageId, 'courses', id, 'videos', video.id))
         await fetchCourseAndVideos() // Refresh the list
-        alert('Video would have been deleted!')
+        alert('Video deleted successfully!')
       } catch (error) {
         console.error('Error deleting video:', error)
         alert('Error deleting video. Please try again.')

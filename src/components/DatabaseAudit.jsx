@@ -45,9 +45,7 @@ export default function DatabaseAudit() {
     runAudit()
   }, [])
 
-  const getStatusColor = (hasIssues) => {
-    return hasIssues ? 'destructive' : 'secondary'
-  }
+  // getStatusColor function removed as it's no longer used
 
   return (
     <Card className="w-full max-w-4xl mx-auto">

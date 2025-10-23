@@ -5,8 +5,10 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Plus, Save, X, AlertCircle } from 'lucide-react'
+import { db } from '@/lib/firebase'
+import { collection, addDoc, updateDoc, doc, Timestamp } from 'firebase/firestore'
 
-export default function VideoForm({ video = null, courseId = null, onSuccess, trigger }) {
+export default function VideoForm({ video = null, courseId = null, onSuccess, trigger, packageId }) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
@@ -25,11 +27,20 @@ export default function VideoForm({ video = null, courseId = null, onSuccess, tr
       // Validate required fields
       if (!formData.video_embed.trim()) {
         alert('Please enter an embed code.')
+        setLoading(false)
         return
       }
       
       if (!formData.course_id) {
         alert('Course ID is required. Please ensure you are adding the video to a specific course.')
+        setLoading(false)
+        return
+      }
+
+      // We also need the packageId to create the video in the correct subcollection
+      if (!packageId) {
+        alert('Package ID is required to create a video')
+        setLoading(false)
         return
       }
 
@@ -37,15 +48,19 @@ export default function VideoForm({ video = null, courseId = null, onSuccess, tr
         title: formData.title,
         description: formData.description || null,
         video_embed: formData.video_embed,
-        course_id: formData.course_id // Ensure course_id is always included
+        course_id: formData.course_id,
+        created_at: Timestamp.now()
       }
 
-      console.log('Saving video data:', videoData)
-      console.log('Video will be linked to course ID:', formData.course_id)
-
-      // Stub implementation - replace with actual database call
-      console.warn('Database functionality removed - video operation not implemented')
-      await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
+      if (video) {
+        // Update existing video
+        const videoRef = doc(db, 'packages', packageId, 'courses', formData.course_id, 'videos', video.id)
+        await updateDoc(videoRef, videoData)
+      } else {
+        // Create new video
+        const videosRef = collection(db, 'packages', packageId, 'courses', formData.course_id, 'videos')
+        await addDoc(videosRef, videoData)
+      }
 
       setOpen(false)
       setFormData({ 
@@ -56,7 +71,7 @@ export default function VideoForm({ video = null, courseId = null, onSuccess, tr
       })
       onSuccess?.()
       
-      alert(`Video would have been ${video ? 'updated' : 'created'} and linked to the course!`)
+      alert(`Video ${video ? 'updated' : 'created'} successfully!`)
     } catch (error) {
       console.error('Error saving video:', error)
       alert('Error saving video. Please try again.')

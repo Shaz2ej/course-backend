@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { BarChart3, TrendingUp, Users, DollarSign } from 'lucide-react'
+import { db } from '@/lib/firebase'
+import { collection, getDocs } from 'firebase/firestore'
 
 export default function Analytics() {
   const [loading, setLoading] = useState(true)
@@ -19,37 +21,110 @@ export default function Analytics() {
       setLoading(true)
       setError(null)
       
-      // Stub implementation - replace with actual database calls
-      console.warn('Database functionality removed - analytics functions not implemented')
-      await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
+      // Fetch students
+      await getDocs(collection(db, 'students'))
       
-      // Mock data
-      setAnalyticsData({
-        revenueGrowth: 12.5,
-        studentGrowth: 8.3,
-        avgOrderValue: 45.75
+      // Fetch purchases and calculate revenue
+      const purchasesSnapshot = await getDocs(collection(db, 'purchases'))
+      let totalRevenue = 0
+      let totalPurchases = 0
+      const monthlyRevenue = {}
+      const monthlyStudents = {}
+      
+      purchasesSnapshot.forEach((doc) => {
+        const purchaseData = doc.data()
+        if (purchaseData.status === 'completed') {
+          totalRevenue += purchaseData.amount || 0
+          totalPurchases++
+          
+          // Calculate monthly revenue
+          if (purchaseData.purchase_date) {
+            const date = purchaseData.purchase_date.toDate ? purchaseData.purchase_date.toDate() : new Date(purchaseData.purchase_date)
+            const monthKey = `${date.getFullYear()}-${date.getMonth() + 1}`
+            monthlyRevenue[monthKey] = (monthlyRevenue[monthKey] || 0) + (purchaseData.amount || 0)
+            
+            // Track student acquisition
+            if (!monthlyStudents[monthKey]) {
+              monthlyStudents[monthKey] = new Set()
+            }
+            if (purchaseData.student_id) {
+              monthlyStudents[monthKey].add(purchaseData.student_id)
+            }
+          }
+        }
       })
-      setRevenueTrends([
-        { month: 'Jan', revenue: 12000 },
-        { month: 'Feb', revenue: 15000 },
-        { month: 'Mar', revenue: 18000 },
-        { month: 'Apr', revenue: 14000 },
-        { month: 'May', revenue: 22000 },
-        { month: 'Jun', revenue: 25000 }
-      ])
-      setStudentAcquisition([
-        { month: 'Jan', students: 120 },
-        { month: 'Feb', students: 150 },
-        { month: 'Mar', students: 180 },
-        { month: 'Apr', students: 140 },
-        { month: 'May', students: 220 },
-        { month: 'Jun', students: 250 }
-      ])
-      setTopPackages([
-        { title: 'Beginner Course Package', totalRevenue: 12500 },
-        { title: 'Advanced Course Package', totalRevenue: 9800 },
-        { title: 'Complete Bundle', totalRevenue: 7600 }
-      ])
+      
+      // Calculate average order value
+      const avgOrderValue = totalPurchases > 0 ? totalRevenue / totalPurchases : 0
+      
+      // Calculate revenue growth (simplified - comparing last two months)
+      const revenueGrowth = 0 // Would need more complex logic for real growth calculation
+      
+      // Calculate student growth (simplified)
+      const studentGrowth = 0 // Would need more complex logic for real growth calculation
+      
+      setAnalyticsData({
+        revenueGrowth,
+        studentGrowth,
+        avgOrderValue
+      })
+      
+      // Format revenue trends
+      const revenueTrendsData = Object.entries(monthlyRevenue)
+        .map(([monthKey, revenue]) => {
+          const [, month] = monthKey.split('-')
+          const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+          return {
+            month: monthNames[parseInt(month, 10) - 1],
+            revenue
+          }
+        })
+        .slice(-6) // Last 6 months
+      
+      setRevenueTrends(revenueTrendsData)
+      
+      // Format student acquisition
+      const studentAcquisitionData = Object.entries(monthlyStudents)
+        .map(([monthKey, studentSet]) => {
+          const [, month] = monthKey.split('-')
+          const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+          return {
+            month: monthNames[parseInt(month, 10) - 1],
+            students: studentSet.size
+          }
+        })
+        .slice(-6) // Last 6 months
+      
+      setStudentAcquisition(studentAcquisitionData)
+      
+      // Fetch packages and calculate top performing ones
+      const packagesSnapshot = await getDocs(collection(db, 'packages'))
+      const packageRevenue = {}
+      
+      // Calculate revenue per package
+      purchasesSnapshot.forEach((doc) => {
+        const purchaseData = doc.data()
+        if (purchaseData.status === 'completed' && purchaseData.package_id) {
+          packageRevenue[purchaseData.package_id] = (packageRevenue[purchaseData.package_id] || 0) + (purchaseData.amount || 0)
+        }
+      })
+      
+      // Get package details and revenue
+      const topPackagesData = []
+      for (const packageDoc of packagesSnapshot.docs) {
+        const packageData = packageDoc.data()
+        const revenue = packageRevenue[packageDoc.id] || 0
+        if (revenue > 0) {
+          topPackagesData.push({
+            title: packageData.title,
+            totalRevenue: revenue
+          })
+        }
+      }
+      
+      // Sort by revenue and take top 3
+      topPackagesData.sort((a, b) => b.totalRevenue - a.totalRevenue)
+      setTopPackages(topPackagesData.slice(0, 3))
     } catch (error) {
       console.error('Error fetching analytics data:', error)
       setError('Failed to load analytics data')

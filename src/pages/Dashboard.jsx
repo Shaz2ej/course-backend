@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Users, DollarSign, ShoppingCart, CreditCard } from 'lucide-react'
+import { db } from '@/lib/firebase'
+import { collection, getDocs } from 'firebase/firestore'
 
 export default function Dashboard() {
   const [stats, setStats] = useState({
@@ -15,17 +17,41 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        // Stub implementation - replace with actual database call
-        console.warn('Database functionality removed - getDashboardStats not implemented')
-        await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
+        // Fetch students count
+        const studentsSnapshot = await getDocs(collection(db, 'students'))
+        const totalStudents = studentsSnapshot.size
         
-        // Mock stats data
+        // Fetch purchases and calculate revenue
+        const purchasesSnapshot = await getDocs(collection(db, 'purchases'))
+        let totalRevenue = 0
+        let totalPurchases = 0
+        
+        purchasesSnapshot.forEach((doc) => {
+          const purchaseData = doc.data()
+          if (purchaseData.status === 'completed') {
+            totalRevenue += purchaseData.amount || 0
+          }
+          totalPurchases++
+        })
+        
+        // Fetch withdrawals
+        const withdrawalsSnapshot = await getDocs(collection(db, 'withdrawals'))
+        let totalWithdrawals = withdrawalsSnapshot.size
+        let pendingWithdrawals = 0
+        
+        withdrawalsSnapshot.forEach((doc) => {
+          const withdrawalData = doc.data()
+          if (withdrawalData.status === 'pending') {
+            pendingWithdrawals++
+          }
+        })
+        
         setStats({
-          totalStudents: 125,
-          totalRevenue: 4250,
-          totalPurchases: 89,
-          totalWithdrawals: 12,
-          pendingWithdrawals: 3
+          totalStudents,
+          totalRevenue,
+          totalPurchases,
+          totalWithdrawals,
+          pendingWithdrawals
         })
       } catch (error) {
         console.error('Error fetching dashboard stats:', error)

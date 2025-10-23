@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -11,7 +11,7 @@ export default function PackageDetailsModal({ package: pkg, trigger }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
-  const fetchPackageDetails = async () => {
+  const fetchPackageDetails = useCallback(async () => {
     if (!pkg?.id || !open) return
     
     try {
@@ -27,13 +27,13 @@ export default function PackageDetailsModal({ package: pkg, trigger }) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [pkg, open])
 
   useEffect(() => {
     if (open) {
       fetchPackageDetails()
     }
-  }, [open, pkg?.id])
+  }, [open, pkg?.id, fetchPackageDetails])
 
   const handleClose = () => {
     setOpen(false)

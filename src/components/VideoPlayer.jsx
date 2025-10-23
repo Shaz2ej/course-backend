@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ExternalLink, Eye, EyeOff, Play, AlertTriangle } from 'lucide-react'
@@ -6,10 +6,22 @@ import { getVideoDisplayInfo, sanitizeEmbedCode, isTrustedEmbedSource } from '@/
 
 export default function VideoPlayer({ video, className = '' }) {
   const [showPreview, setShowPreview] = useState(false)
+  const iframeRef = useRef(null)
   
+  // Calculate display info safely
+  const displayInfo = video ? getVideoDisplayInfo(video.video_url, video.embed_code) : { url: '' }
+  
+  useEffect(() => {
+    // Only update iframe src if video exists and iframeRef is available
+    if (video && iframeRef.current) {
+      const info = getVideoDisplayInfo(video.video_url, video.embed_code)
+      iframeRef.current.src = info.url
+    }
+  }, [video])
+  
+  // Handle the case where video is null
   if (!video) return null
   
-  const displayInfo = getVideoDisplayInfo(video.video_url, video.embed_code)
   const hasEmbed = video.embed_code && video.embed_code.trim()
   const isTrusted = hasEmbed ? isTrustedEmbedSource(video.embed_code) : true
   
@@ -29,6 +41,9 @@ export default function VideoPlayer({ video, className = '' }) {
     )
   }
   
+  // Replace process.env with import.meta.env for Vite
+  const isDev = import.meta.env.DEV
+
   return (
     <div className={`space-y-3 ${className}`}>
       {/* Platform and type info */}
@@ -112,7 +127,7 @@ export default function VideoPlayer({ video, className = '' }) {
       )}
       
       {/* Debug info for development */}
-      {process.env.NODE_ENV === 'development' && (
+      {isDev && (
         <details className="text-xs text-muted-foreground">
           <summary className="cursor-pointer">Debug Info</summary>
           <div className="mt-2 space-y-1">

@@ -8,6 +8,8 @@ import { Search, Plus, Edit, Trash2, Play, Eye, Video } from 'lucide-react'
 import CourseForm from '@/components/CourseForm'
 import VideoForm from '@/components/VideoForm'
 import VideosModal from '@/components/VideosModal'
+import { db } from '@/lib/firebase'
+import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore'
 
 export default function Courses() {
   const navigate = useNavigate()
@@ -18,27 +20,25 @@ export default function Courses() {
   const fetchCourses = async () => {
     try {
       setLoading(true)
-      // Stub implementation - replace with actual database call
-      console.warn('Database functionality removed - getCourses not implemented')
-      await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
+      // Fetch all packages first
+      const packagesSnapshot = await getDocs(collection(db, 'packages'))
+      const allCourses = []
       
-      // Mock courses data
-      setCourses([
-        {
-          id: '1',
-          title: 'Sample Course 1',
-          description: 'This is a sample course description.',
-          created_at: new Date().toISOString(),
-          video_count: 0
-        },
-        {
-          id: '2',
-          title: 'Sample Course 2',
-          description: 'This is another sample course description.',
-          created_at: new Date().toISOString(),
-          video_count: 0
-        }
-      ])
+      // For each package, fetch its courses subcollection
+      for (const packageDoc of packagesSnapshot.docs) {
+        const coursesSnapshot = await getDocs(collection(db, 'packages', packageDoc.id, 'courses'))
+        coursesSnapshot.forEach((courseDoc) => {
+          const courseData = courseDoc.data()
+          allCourses.push({
+            id: courseDoc.id,
+            packageId: packageDoc.id,
+            ...courseData,
+            created_at: courseData.created_at?.toDate ? courseData.created_at.toDate().toISOString() : new Date().toISOString()
+          })
+        })
+      }
+      
+      setCourses(allCourses)
     } catch (error) {
       console.error('Error fetching courses:', error)
       setCourses([])
@@ -57,13 +57,10 @@ export default function Courses() {
 
   const handleDeleteCourse = async (course) => {
     try {
-      // Stub implementation - replace with actual database call
-      console.warn('Database functionality removed - checkCourseDependencies/deleteCourse not implemented')
-      await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
-      
       if (confirm(`Are you sure you want to delete "${course.title}"?`)) {
+        await deleteDoc(doc(db, 'packages', course.packageId, 'courses', course.id))
         await fetchCourses() // Refresh the list
-        alert('Course would have been deleted!')
+        alert('Course deleted successfully!')
       }
     } catch (error) {
       console.error('Error deleting course:', error)
@@ -71,15 +68,7 @@ export default function Courses() {
     }
   }
 
-  const handleViewVideos = async (course) => {
-    // The VideosModal component will handle fetching and displaying videos
-    // No additional logic needed here as the modal handles everything
-  }
-
-  const handleAddVideo = (course) => {
-    // The VideoForm component will handle adding videos
-    // No additional logic needed here as the form handles everything
-  }
+  // Removed unused functions
 
   const filteredCourses = courses.filter(course =>
     course.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||

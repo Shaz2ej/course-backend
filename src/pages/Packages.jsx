@@ -5,39 +5,19 @@ import { Input } from '@/components/ui/input'
 import { Search, Plus, Edit, Trash2, Eye } from 'lucide-react'
 import PackageForm from '@/components/PackageForm'
 import PackageDetailsModal from '@/components/PackageDetailsModal'
+import { getPackages, deletePackage } from '@/lib/firestoreUtils'
 
 export default function Packages() {
   const [packages, setPackages] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedPackage, setSelectedPackage] = useState(null)
-  const [showAddForm, setShowAddForm] = useState(false)
-  const [showEditForm, setShowEditForm] = useState(false)
+  // Removed unused state variables
 
   const fetchPackages = async () => {
     try {
       setLoading(true)
-      // Stub implementation - replace with actual database call
-      console.warn('Database functionality removed - getPackages not implemented')
-      await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
-      
-      // Mock packages data
-      setPackages([
-        {
-          id: '1',
-          title: 'Basic Course Package',
-          description: 'A basic package with essential courses',
-          price: 49.99,
-          created_at: new Date().toISOString()
-        },
-        {
-          id: '2',
-          title: 'Premium Course Package',
-          description: 'A premium package with all courses',
-          price: 99.99,
-          created_at: new Date().toISOString()
-        }
-      ])
+      const data = await getPackages()
+      setPackages(data || [])
     } catch (error) {
       console.error('Error fetching packages:', error)
       setPackages([])
@@ -50,25 +30,12 @@ export default function Packages() {
     fetchPackages()
   }, [])
 
-  const handleAddPackage = () => {
-    setSelectedPackage(null)
-    setShowAddForm(true)
-  }
-
-  const handleEditPackage = (pkg) => {
-    setSelectedPackage(pkg)
-    setShowEditForm(true)
-  }
-
   const handleDeletePackage = async (pkg) => {
     try {
-      // Stub implementation - replace with actual database call
-      console.warn('Database functionality removed - deletePackage not implemented')
-      await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
-      
       if (confirm(`Are you sure you want to delete "${pkg.title}"?`)) {
+        await deletePackage(pkg.id)
         await fetchPackages() // Refresh the list
-        console.log('Package would have been deleted')
+        console.log('Package deleted successfully')
       }
     } catch (error) {
       console.error('Error deleting package:', error)
@@ -76,15 +43,9 @@ export default function Packages() {
     }
   }
 
-  const handleViewDetails = (pkg) => {
-    // Package details will be handled by the PackageDetailsModal component
-  }
-
   const handleFormSuccess = () => {
     fetchPackages() // Refresh the packages list
-    setShowAddForm(false)
-    setShowEditForm(false)
-    setSelectedPackage(null)
+    // Removed unused state updates
   }
 
   const filteredPackages = packages.filter(pkg =>

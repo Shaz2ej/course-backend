@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
@@ -6,43 +6,50 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Play, Edit, Trash2, Plus } from 'lucide-react'
 import VideoForm from './VideoForm'
 import VideoPlayer from './VideoPlayer'
+import { db } from '@/lib/firebase'
+import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore'
 
 export default function VideosModal({ course, trigger }) {
   const [open, setOpen] = useState(false)
   const [videos, setVideos] = useState([])
   const [loading, setLoading] = useState(false)
 
-  const fetchVideos = async () => {
-    if (!course?.id) return
+  const fetchVideos = useCallback(async () => {
+    if (!course?.id || !course?.packageId) return
     
     try {
       setLoading(true)
-      // Stub implementation - replace with actual database call
-      console.warn('Database functionality removed - getCourseVideos not implemented')
-      await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
-      setVideos([])
+      const videosSnapshot = await getDocs(collection(db, 'packages', course.packageId, 'courses', course.id, 'videos'))
+      const videosData = []
+      videosSnapshot.forEach((videoDoc) => {
+        const videoData = videoDoc.data()
+        videosData.push({
+          id: videoDoc.id,
+          ...videoData,
+          created_at: videoData.created_at?.toDate ? videoData.created_at.toDate().toISOString() : new Date().toISOString()
+        })
+      })
+      setVideos(videosData)
     } catch (error) {
       console.error('Error fetching videos:', error)
       setVideos([])
     } finally {
       setLoading(false)
     }
-  }
+  }, [course?.id, course?.packageId])
 
   useEffect(() => {
     if (open) {
       fetchVideos()
     }
-  }, [open, course?.id])
+  }, [open, course?.id, fetchVideos])
 
   const handleDeleteVideo = async (video) => {
     if (confirm(`Are you sure you want to delete "${video.title}"?`)) {
       try {
-        // Stub implementation - replace with actual database call
-        console.warn('Database functionality removed - deleteCourseVideo not implemented')
-        await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
+        await deleteDoc(doc(db, 'packages', course.packageId, 'courses', course.id, 'videos', video.id))
         await fetchVideos() // Refresh the list
-        alert('Video would have been deleted!')
+        alert('Video deleted successfully!')
       } catch (error) {
         console.error('Error deleting video:', error)
         alert('Error deleting video. Please try again.')

@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Search, Mail, Phone, Edit, Trash2, Plus } from 'lucide-react'
 import StudentForm from '@/components/StudentForm'
+import { getStudents, deleteStudent } from '@/lib/firestoreUtils'
 
 export default function Students() {
   const [students, setStudents] = useState([])
@@ -13,29 +14,9 @@ export default function Students() {
 
   const fetchStudents = async () => {
     try {
-      // Stub implementation - replace with actual database call
-      console.warn('Database functionality removed - getStudents not implemented')
-      await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
-      
-      // Mock students data
-      setStudents([
-        {
-          id: '1',
-          name: 'John Doe',
-          email: 'john@example.com',
-          phone: '123-456-7890',
-          referral_code: 'JD001',
-          created_at: new Date().toISOString()
-        },
-        {
-          id: '2',
-          name: 'Jane Smith',
-          email: 'jane@example.com',
-          phone: '098-765-4321',
-          referral_code: 'JS002',
-          created_at: new Date().toISOString()
-        }
-      ])
+      setLoading(true)
+      const data = await getStudents()
+      setStudents(data || [])
     } catch (error) {
       console.error('Error fetching students:', error)
       setStudents([])
@@ -50,11 +31,8 @@ export default function Students() {
 
   const handleDelete = async (id) => {
     try {
-      // Stub implementation - replace with actual database call
-      console.warn('Database functionality removed - deleteStudent not implemented')
-      await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
-      
       if (confirm('Are you sure you want to delete this student?')) {
+        await deleteStudent(id)
         await fetchStudents()
       }
     } catch (error) {
