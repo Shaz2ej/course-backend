@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Search, Mail, Phone, Edit, Trash2, Plus } from 'lucide-react'
-import { getStudents, deleteStudent } from '@/lib/database'
 import StudentForm from '@/components/StudentForm'
 
 export default function Students() {
@@ -14,8 +13,29 @@ export default function Students() {
 
   const fetchStudents = async () => {
     try {
-      const data = await getStudents()
-      setStudents(data || [])
+      // Stub implementation - replace with actual database call
+      console.warn('Database functionality removed - getStudents not implemented')
+      await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
+      
+      // Mock students data
+      setStudents([
+        {
+          id: '1',
+          name: 'John Doe',
+          email: 'john@example.com',
+          phone: '123-456-7890',
+          referral_code: 'JD001',
+          created_at: new Date().toISOString()
+        },
+        {
+          id: '2',
+          name: 'Jane Smith',
+          email: 'jane@example.com',
+          phone: '098-765-4321',
+          referral_code: 'JS002',
+          created_at: new Date().toISOString()
+        }
+      ])
     } catch (error) {
       console.error('Error fetching students:', error)
       setStudents([])
@@ -29,14 +49,17 @@ export default function Students() {
   }, [])
 
   const handleDelete = async (id) => {
-    if (confirm('Are you sure you want to delete this student?')) {
-      try {
-        await deleteStudent(id)
+    try {
+      // Stub implementation - replace with actual database call
+      console.warn('Database functionality removed - deleteStudent not implemented')
+      await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
+      
+      if (confirm('Are you sure you want to delete this student?')) {
         await fetchStudents()
-      } catch (error) {
-        console.error('Error deleting student:', error)
-        alert('Error deleting student. Please try again.')
       }
+    } catch (error) {
+      console.error('Error deleting student:', error)
+      alert('Error deleting student. Please try again.')
     }
   }
 

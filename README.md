@@ -1,6 +1,6 @@
 # Course Admin Panel
 
-A fully functional mobile admin panel for a course/affiliate platform built with React and Supabase.
+A fully functional mobile admin panel for a course/affiliate platform built with React.
 
 ## Features
 
@@ -15,7 +15,6 @@ A fully functional mobile admin panel for a course/affiliate platform built with
 
 ### 🔧 Technical Features
 - **Responsive Design**: Mobile-first design that works on all devices
-- **Real-time Data**: Connected to Supabase for real-time database operations
 - **Modern UI**: Built with Tailwind CSS and shadcn/ui components
 - **APK Ready**: Optimized for mobile app deployment
 - **CRUD Operations**: Full Create, Read, Update, Delete functionality
@@ -27,16 +26,15 @@ A fully functional mobile admin panel for a course/affiliate platform built with
 ## Technology Stack
 
 - **Frontend**: React 19, Vite
-- **UI Framework**: Tailwind CSS, shadcn/ui
+- **UI Framework**: Tailwind CSS, shadn/ui
 - **Icons**: Lucide React
-- **Backend**: Supabase (PostgreSQL)
 - **Routing**: React Router DOM
 - **Build Tool**: Vite
 - **Package Manager**: pnpm
 
 ## Database Schema
 
-The application connects to the following Supabase tables:
+The application connects to the following database tables:
 
 ### Students
 - `id` (UUID, Primary Key)
@@ -102,7 +100,6 @@ The application connects to the following Supabase tables:
 ### Prerequisites
 - Node.js 18+ 
 - pnpm (recommended) or npm
-- Supabase account and project
 
 ### 1. Clone and Install
 ```bash
@@ -114,13 +111,11 @@ cd course-admin-panel
 pnpm install
 ```
 
-### 2. Supabase Configuration
-The application is pre-configured with the provided Supabase credentials:
-- **URL**: `https://pnupcskyrxivtjhwmvax.supabase.co`
-- **ANON KEY**: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`
+### 2. Database Configuration
+The application is pre-configured with the provided database credentials.
 
 ### 3. Database Setup
-Create the required tables in your Supabase project using the SQL schema provided above. You can run these commands in the Supabase SQL editor:
+Create the required tables in your database project using the SQL schema provided above. You can run these commands in the database SQL editor:
 
 ```sql
 -- Enable UUID extension
@@ -207,7 +202,6 @@ course-admin-panel/
 │   │   ├── Courses.jsx
 │   │   └── Analytics.jsx
 │   ├── lib/              # Utility functions
-│   │   ├── supabase.js   # Supabase client
 │   │   ├── database.js   # Database operations
 │   │   └── types.js      # Type definitions
 │   ├── App.jsx           # Main app component
@@ -219,7 +213,7 @@ course-admin-panel/
 ## Key Features Implementation
 
 ### Dashboard Statistics
-- Real-time data from Supabase
+- Real-time data from database
 - Responsive cards showing key metrics
 - Loading states and error handling
 
@@ -242,17 +236,11 @@ course-admin-panel/
 
 ## Environment Variables
 
-The Supabase configuration is currently hardcoded in `src/lib/supabase.js`. For production, consider using environment variables:
-
-```env
-VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-```
+The database configuration is currently using stub implementations.
 
 ## Security Considerations
 
-- Implement Row Level Security (RLS) in Supabase
-- Add authentication for admin access
+- Implement authentication for admin access
 - Validate all user inputs
 - Use environment variables for sensitive data
 - Implement proper error handling
@@ -288,4 +276,3 @@ This project is licensed under the MIT License.
 ## Support
 
 For support and questions, please contact the development team or create an issue in the repository.
-

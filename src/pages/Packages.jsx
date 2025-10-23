@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Search, Plus, Edit, Trash2, Eye } from 'lucide-react'
-import { getPackages, deletePackage } from '@/lib/database'
 import PackageForm from '@/components/PackageForm'
 import PackageDetailsModal from '@/components/PackageDetailsModal'
 
@@ -18,8 +17,27 @@ export default function Packages() {
   const fetchPackages = async () => {
     try {
       setLoading(true)
-      const data = await getPackages()
-      setPackages(data || [])
+      // Stub implementation - replace with actual database call
+      console.warn('Database functionality removed - getPackages not implemented')
+      await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
+      
+      // Mock packages data
+      setPackages([
+        {
+          id: '1',
+          title: 'Basic Course Package',
+          description: 'A basic package with essential courses',
+          price: 49.99,
+          created_at: new Date().toISOString()
+        },
+        {
+          id: '2',
+          title: 'Premium Course Package',
+          description: 'A premium package with all courses',
+          price: 99.99,
+          created_at: new Date().toISOString()
+        }
+      ])
     } catch (error) {
       console.error('Error fetching packages:', error)
       setPackages([])
@@ -43,15 +61,18 @@ export default function Packages() {
   }
 
   const handleDeletePackage = async (pkg) => {
-    if (confirm(`Are you sure you want to delete "${pkg.title}"?`)) {
-      try {
-        await deletePackage(pkg.id)
+    try {
+      // Stub implementation - replace with actual database call
+      console.warn('Database functionality removed - deletePackage not implemented')
+      await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
+      
+      if (confirm(`Are you sure you want to delete "${pkg.title}"?`)) {
         await fetchPackages() // Refresh the list
-        console.log('Package deleted successfully')
-      } catch (error) {
-        console.error('Error deleting package:', error)
-        alert('Error deleting package. Please try again.')
+        console.log('Package would have been deleted')
       }
+    } catch (error) {
+      console.error('Error deleting package:', error)
+      alert('Error deleting package. Please try again.')
     }
   }
 

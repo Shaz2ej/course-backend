@@ -5,7 +5,6 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Plus, Save, X } from 'lucide-react'
-import { createCourse, updateCourse } from '@/lib/database'
 
 export default function CourseForm({ course = null, onSuccess, trigger }) {
   const [open, setOpen] = useState(false)
@@ -25,26 +24,18 @@ export default function CourseForm({ course = null, onSuccess, trigger }) {
         description: formData.description
       }
 
-      if (course) {
-        await updateCourse(course.id, courseData)
-      } else {
-        await createCourse(courseData)
-      }
+      // Stub implementation - replace with actual database call
+      console.warn('Database functionality removed - course operation not implemented')
+      await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
 
       setOpen(false)
       setFormData({ title: '', description: '' })
       onSuccess?.()
       
-      alert(`Course ${course ? 'updated' : 'created'} successfully!`)
+      alert(`Course would have been ${course ? 'updated' : 'created'}!`)
     } catch (error) {
       console.error('Error saving course:', error)
-      console.error('Error details:', {
-        message: error.message,
-        code: error.code,
-        details: error.details,
-        hint: error.hint
-      })
-      alert(`Error saving course: ${error.message || 'Please try again.'}`)
+      alert('Error saving course. Please try again.')
     } finally {
       setLoading(false)
     }

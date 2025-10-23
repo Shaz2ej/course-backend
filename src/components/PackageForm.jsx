@@ -6,7 +6,6 @@ import { Textarea } from '@/components/ui/textarea'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Plus, Save, X, Upload, Trash2 } from 'lucide-react'
-import { createPackage, updatePackage, getCourses, linkPackageToCourse, unlinkPackageFromCourse, uploadFile } from '@/lib/database'
 
 export default function PackageForm({ packageData = null, onSuccess, trigger }) {
   const [open, setOpen] = useState(false)
@@ -35,8 +34,10 @@ export default function PackageForm({ packageData = null, onSuccess, trigger }) 
   const fetchCourses = async () => {
     try {
       setLoadingCourses(true)
-      const courses = await getCourses()
-      setAvailableCourses(courses || [])
+      // Stub implementation - replace with actual database call
+      console.warn('Database functionality removed - fetchCourses not implemented')
+      await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
+      setAvailableCourses([])
     } catch (error) {
       console.error('Error fetching courses:', error)
       setAvailableCourses([])
@@ -47,6 +48,9 @@ export default function PackageForm({ packageData = null, onSuccess, trigger }) 
 
   const fetchPackageCourses = async () => {
     try {
+      // Stub implementation - replace with actual database call
+      console.warn('Database functionality removed - fetchPackageCourses not implemented')
+      await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
       if (packageData?.package_courses) {
         const courseIds = packageData.package_courses.map(pc => pc.courses.id)
         setSelectedCourses(courseIds)
@@ -62,13 +66,12 @@ export default function PackageForm({ packageData = null, onSuccess, trigger }) 
 
     try {
       setUploading(true)
-      const thumbnailUrl = await uploadFile(file, 'thumbnails')
-      setFormData(prev => ({ ...prev, thumbnail_url: thumbnailUrl }))
-      console.log('Thumbnail uploaded successfully:', thumbnailUrl)
+      // Stub implementation - replace with actual upload function
+      console.warn('Database functionality removed - uploadFile not implemented')
+      alert('File upload functionality has been removed')
     } catch (error) {
       console.error('Error uploading file:', error)
-      // Show specific error message from uploadFile function
-      alert(`Upload failed: ${error.message}`)
+      alert('Upload failed: File upload functionality has been removed')
     } finally {
       setUploading(false)
     }
@@ -100,57 +103,19 @@ export default function PackageForm({ packageData = null, onSuccess, trigger }) 
         thumbnail_url: formData.thumbnail_url
       }
 
-      let savedPackage
-      if (packageData) {
-        savedPackage = await updatePackage(packageData.id, packageSubmitData)
-        
-        // Handle course relationships for existing package
-        if (packageData.package_courses) {
-          const currentCourseIds = packageData.package_courses.map(pc => pc.courses.id)
-          
-          // Remove courses that are no longer selected
-          for (const courseId of currentCourseIds) {
-            if (!selectedCourses.includes(courseId)) {
-              await unlinkPackageFromCourse(packageData.id, courseId)
-            }
-          }
-          
-          // Add newly selected courses
-          for (const courseId of selectedCourses) {
-            if (!currentCourseIds.includes(courseId)) {
-              await linkPackageToCourse(packageData.id, courseId)
-            }
-          }
-        } else {
-          // If no existing courses, add all selected ones
-          for (const courseId of selectedCourses) {
-            await linkPackageToCourse(packageData.id, courseId)
-          }
-        }
-      } else {
-        savedPackage = await createPackage(packageSubmitData)
-        
-        // Link selected courses to new package
-        for (const courseId of selectedCourses) {
-          await linkPackageToCourse(savedPackage.id, courseId)
-        }
-      }
+      // Stub implementation - replace with actual database call
+      console.warn('Database functionality removed - package operation not implemented')
+      await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
 
       setOpen(false)
       setFormData({ title: '', description: '', price: '', thumbnail_url: '' })
       setSelectedCourses([])
       onSuccess?.()
       
-      alert(`Package ${packageData ? 'updated' : 'created'} successfully!`)
+      alert(`Package would have been ${packageData ? 'updated' : 'created'}!`)
     } catch (error) {
       console.error('Error saving package:', error)
-      console.error('Error details:', {
-        message: error.message,
-        code: error.code,
-        details: error.details,
-        hint: error.hint
-      })
-      alert(`Error saving package: ${error.message || 'Please try again.'}`)
+      alert('Error saving package. Please try again.')
     } finally {
       setLoading(false)
     }

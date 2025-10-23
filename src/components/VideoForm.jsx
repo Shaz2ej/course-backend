@@ -5,7 +5,6 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Plus, Save, X, AlertCircle } from 'lucide-react'
-import { createVideoForCourse, updateCourseVideo } from '@/lib/database'
 
 export default function VideoForm({ video = null, courseId = null, onSuccess, trigger }) {
   const [open, setOpen] = useState(false)
@@ -44,13 +43,9 @@ export default function VideoForm({ video = null, courseId = null, onSuccess, tr
       console.log('Saving video data:', videoData)
       console.log('Video will be linked to course ID:', formData.course_id)
 
-      if (video) {
-        // Update existing video
-        await updateCourseVideo(video.id, videoData)
-      } else {
-        // Create new video with proper course validation
-        await createVideoForCourse(formData.course_id, videoData)
-      }
+      // Stub implementation - replace with actual database call
+      console.warn('Database functionality removed - video operation not implemented')
+      await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
 
       setOpen(false)
       setFormData({ 
@@ -61,19 +56,10 @@ export default function VideoForm({ video = null, courseId = null, onSuccess, tr
       })
       onSuccess?.()
       
-      alert(`Video ${video ? 'updated' : 'created'} successfully and linked to the course!`)
+      alert(`Video would have been ${video ? 'updated' : 'created'} and linked to the course!`)
     } catch (error) {
       console.error('Error saving video:', error)
-      
-      if (error.message.includes('Invalid course ID')) {
-        alert('Error: The course you are trying to add the video to does not exist. Please refresh the page and try again.')
-      } else if (error.message.includes('video_embed') || error.code === '42703') {
-        alert('Database needs update. Please run this SQL command in Supabase:\n\nALTER TABLE course_videos ADD COLUMN video_embed TEXT;')
-      } else if (error.message.includes('Course ID is required')) {
-        alert('Error: Course ID is required. Please ensure you are adding the video from a specific course page.')
-      } else {
-        alert(`Error saving video: ${error.message}`)
-      }
+      alert('Error saving video. Please try again.')
     } finally {
       setLoading(false)
     }

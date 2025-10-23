@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Eye, Package, BookOpen, Calendar, DollarSign, X } from 'lucide-react'
-import { getPackageById } from '@/lib/database'
 
 export default function PackageDetailsModal({ package: pkg, trigger }) {
   const [open, setOpen] = useState(false)
@@ -18,8 +17,10 @@ export default function PackageDetailsModal({ package: pkg, trigger }) {
     try {
       setLoading(true)
       setError(null)
-      const data = await getPackageById(pkg.id)
-      setPackageDetails(data)
+      // Stub implementation - replace with actual database call
+      console.warn('Database functionality removed - getPackageById not implemented')
+      await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
+      setPackageDetails(pkg) // Use the passed package data
     } catch (error) {
       console.error('Error fetching package details:', error)
       setError('Failed to load package details. Please try again.')

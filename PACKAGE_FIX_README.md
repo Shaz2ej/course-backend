@@ -6,7 +6,7 @@ The bug "Error saving package. Please try again." was caused by a **database sch
 ## Root Cause
 - **Expected**: `package_courses` table with columns `package_id`, `course_id`
 - **Actual**: `package_courses` table with columns `Package_id`, `Course_id` (capitalized)
-- This caused `PGRST204` errors when trying to insert package-course relationships
+- This caused errors when trying to insert package-course relationships
 
 ## Changes Made
 
@@ -37,19 +37,7 @@ The bug "Error saving package. Please try again." was caused by a **database sch
 8. Verify the package appears in the packages list
 
 ### Test 2: Verify Database Records
-After creating a package with courses, verify the database contains:
-
-```javascript
-// Check packages table
-import('./src/lib/supabase.js').then(m => 
-  m.supabase.from('packages').select('*').then(r => console.log('Packages:', r.data))
-)
-
-// Check package_courses table
-import('./src/lib/supabase.js').then(m => 
-  m.supabase.from('package_courses').select('*').then(r => console.log('Package courses:', r.data))
-)
-```
+After creating a package with courses, verify the database contains the records.
 
 ### Test 3: Edit Package with Course Changes
 1. Click the **Edit** button on an existing package
@@ -86,9 +74,9 @@ Note the **capitalized column names** - this differs from the documentation but 
 ## Troubleshooting
 If package creation still fails:
 
-1. **Check console errors**: Look for specific error codes (PGRST204, etc.)
+1. **Check console errors**: Look for specific error codes
 2. **Verify course availability**: Ensure courses exist before testing
-3. **Check database connection**: Verify Supabase credentials are correct
+3. **Check database connection**: Verify database credentials are correct
 4. **Column name mismatch**: Ensure database functions use correct column names
 
 ## Future Improvements

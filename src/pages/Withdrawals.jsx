@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Search, Check, X } from 'lucide-react'
-import { getWithdrawals, updateWithdrawalStatus } from '@/lib/database'
 
 export default function Withdrawals() {
   const [withdrawals, setWithdrawals] = useState([])
@@ -15,8 +14,33 @@ export default function Withdrawals() {
   useEffect(() => {
     const fetchWithdrawals = async () => {
       try {
-        const data = await getWithdrawals()
-        setWithdrawals(data || [])
+        // Stub implementation - replace with actual database call
+        console.warn('Database functionality removed - getWithdrawals not implemented')
+        await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
+        
+        // Mock withdrawals data
+        setWithdrawals([
+          {
+            id: '1',
+            amount: 50.00,
+            status: 'pending',
+            created_at: new Date().toISOString(),
+            students: {
+              name: 'John Doe',
+              email: 'john@example.com'
+            }
+          },
+          {
+            id: '2',
+            amount: 100.00,
+            status: 'approved',
+            created_at: new Date().toISOString(),
+            students: {
+              name: 'Jane Smith',
+              email: 'jane@example.com'
+            }
+          }
+        ])
       } catch (error) {
         console.error('Error fetching withdrawals:', error)
         setWithdrawals([])
@@ -37,7 +61,10 @@ export default function Withdrawals() {
   const handleStatusUpdate = async (id, status) => {
     setProcessingId(id)
     try {
-      await updateWithdrawalStatus(id, status)
+      // Stub implementation - replace with actual database call
+      console.warn('Database functionality removed - updateWithdrawalStatus not implemented')
+      await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
+      
       setWithdrawals(prev => 
         prev.map(w => w.id === id ? { ...w, status } : w)
       )

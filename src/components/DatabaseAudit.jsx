@@ -3,12 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { AlertTriangle, CheckCircle, Database, RefreshCw } from 'lucide-react'
-import { 
-  auditVideoRelationships, 
-  getCoursesByPackageId, 
-  getPackagesByCourseId,
-  getVideosByCourseId 
-} from '@/lib/database'
 
 export default function DatabaseAudit() {
   const [auditData, setAuditData] = useState(null)
@@ -18,35 +12,30 @@ export default function DatabaseAudit() {
   const runAudit = async () => {
     setLoading(true)
     try {
-      // Audit video relationships
-      const videoAudit = await auditVideoRelationships()
+      // Stub implementation - replace with actual database call
+      console.warn('Database functionality removed - auditVideoRelationships not implemented')
+      await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
+      
+      // Mock audit data
+      const videoAudit = {
+        totalVideos: 0,
+        validVideos: 0,
+        orphanedVideos: []
+      }
       setAuditData(videoAudit)
       
-      // Test sample relationships
-      const results = {}
-      
-      // Test if we can fetch courses for a package (this should work)
-      try {
-        const samplePackages = await fetch('/api/packages').then(r => r.json()).catch(() => [])
-        if (samplePackages.length > 0) {
-          const packageCourses = await getCoursesByPackageId(samplePackages[0].id)
-          results.packageCourseLink = {
-            success: true,
-            message: `Found ${packageCourses.length} courses for package`,
-            data: packageCourses
-          }
-        }
-      } catch (error) {
-        results.packageCourseLink = {
+      // Mock test results
+      const results = {
+        packageCourseLink: {
           success: false,
-          message: `Error testing package-course relationship: ${error.message}`
+          message: 'Database functionality removed - getCoursesByPackageId not implemented'
         }
       }
       
       setTestResults(results)
     } catch (error) {
       console.error('Audit failed:', error)
-      setAuditData({ error: error.message })
+      setAuditData({ error: 'Database functionality has been removed' })
     } finally {
       setLoading(false)
     }

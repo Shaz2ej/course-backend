@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Search } from 'lucide-react'
-import { getPackageReferralCodes } from '@/lib/database'
 import { Badge } from '@/components/ui/badge'
 
 export default function PackageReferralCodes() {
@@ -13,8 +12,29 @@ export default function PackageReferralCodes() {
   useEffect(() => {
     const fetchReferralCodes = async () => {
       try {
-        const data = await getPackageReferralCodes()
-        setReferralCodes(data || [])
+        // Stub implementation - replace with actual database call
+        console.warn('Database functionality removed - getPackageReferralCodes not implemented')
+        await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
+        
+        // Mock referral codes data
+        setReferralCodes([
+          {
+            id: '1',
+            student_name: 'John Doe',
+            student_email: 'john@example.com',
+            package_name: 'Basic Course Package',
+            referral_code: 'JD001',
+            created_at: new Date().toISOString()
+          },
+          {
+            id: '2',
+            student_name: 'Jane Smith',
+            student_email: 'jane@example.com',
+            package_name: 'Premium Course Package',
+            referral_code: 'JS002',
+            created_at: new Date().toISOString()
+          }
+        ])
       } catch (error) {
         console.error('Error fetching referral codes:', error)
         setReferralCodes([])

@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Search, UserCheck, UserX } from 'lucide-react'
-import { getPurchases } from '@/lib/database'
 
 export default function Purchases() {
   const [purchases, setPurchases] = useState([])
@@ -13,8 +12,49 @@ export default function Purchases() {
   useEffect(() => {
     const fetchPurchases = async () => {
       try {
-        const data = await getPurchases()
-        setPurchases(data || [])
+        // Stub implementation - replace with actual database call
+        console.warn('Database functionality removed - getPurchases not implemented')
+        await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
+        
+        // Mock purchases data
+        setPurchases([
+          {
+            id: '1',
+            amount: 49.99,
+            status: 'completed',
+            commission: 4.99,
+            created_at: new Date().toISOString(),
+            students: {
+              name: 'John Doe',
+              email: 'john@example.com'
+            },
+            packages: {
+              title: 'Basic Course Package',
+              price: 49.99
+            },
+            affiliate_id: null
+          },
+          {
+            id: '2',
+            amount: 99.99,
+            status: 'completed',
+            commission: 9.99,
+            created_at: new Date().toISOString(),
+            students: {
+              name: 'Jane Smith',
+              email: 'jane@example.com'
+            },
+            packages: {
+              title: 'Premium Course Package',
+              price: 99.99
+            },
+            affiliate_id: '1',
+            referrer: {
+              name: 'Bob Johnson',
+              email: 'bob@example.com'
+            }
+          }
+        ])
       } catch (error) {
         console.error('Error fetching purchases:', error)
         setPurchases([])

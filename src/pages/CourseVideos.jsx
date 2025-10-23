@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { ArrowLeft, Search, Plus, Edit, Trash2, Play } from 'lucide-react'
-import { getCourseById, getCourseVideos, deleteCourseVideo } from '@/lib/database'
 import VideoForm from '@/components/VideoForm'
 
 export default function CourseVideos() {
@@ -20,16 +19,19 @@ export default function CourseVideos() {
     try {
       setLoading(true)
       
-      // Fetch course details
-      const courseData = await getCourseById(id)
-      if (!courseData) {
-        throw new Error('Course not found')
+      // Stub implementation - replace with actual database calls
+      console.warn('Database functionality removed - getCourseById/getCourseVideos not implemented')
+      await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
+      
+      // Mock course data
+      const courseData = {
+        id: id,
+        title: 'Sample Course'
       }
       setCourse(courseData)
       
-      // Fetch course videos
-      const videosData = await getCourseVideos(id)
-      setVideos(videosData || [])
+      // Mock videos data
+      setVideos([])
     } catch (error) {
       console.error('Error fetching course data:', error)
       alert('Error loading course data. Please try again.')
@@ -52,9 +54,11 @@ export default function CourseVideos() {
   const handleDeleteVideo = async (video) => {
     if (confirm(`Are you sure you want to delete "${video.title}"?`)) {
       try {
-        await deleteCourseVideo(video.id)
+        // Stub implementation - replace with actual database call
+        console.warn('Database functionality removed - deleteCourseVideo not implemented')
+        await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
         await fetchCourseAndVideos() // Refresh the list
-        alert('Video deleted successfully!')
+        alert('Video would have been deleted!')
       } catch (error) {
         console.error('Error deleting video:', error)
         alert('Error deleting video. Please try again.')

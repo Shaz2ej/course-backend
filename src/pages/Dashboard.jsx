@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Users, DollarSign, ShoppingCart, CreditCard } from 'lucide-react'
-import { getDashboardStats } from '@/lib/database'
 
 export default function Dashboard() {
   const [stats, setStats] = useState({
@@ -16,8 +15,18 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const data = await getDashboardStats()
-        setStats(data)
+        // Stub implementation - replace with actual database call
+        console.warn('Database functionality removed - getDashboardStats not implemented')
+        await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
+        
+        // Mock stats data
+        setStats({
+          totalStudents: 125,
+          totalRevenue: 4250,
+          totalPurchases: 89,
+          totalWithdrawals: 12,
+          pendingWithdrawals: 3
+        })
       } catch (error) {
         console.error('Error fetching dashboard stats:', error)
       } finally {

@@ -4,7 +4,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Play, Edit, Trash2, Plus } from 'lucide-react'
-import { getCourseVideos, deleteCourseVideo } from '@/lib/database'
 import VideoForm from './VideoForm'
 import VideoPlayer from './VideoPlayer'
 
@@ -18,8 +17,10 @@ export default function VideosModal({ course, trigger }) {
     
     try {
       setLoading(true)
-      const data = await getCourseVideos(course.id)
-      setVideos(data || [])
+      // Stub implementation - replace with actual database call
+      console.warn('Database functionality removed - getCourseVideos not implemented')
+      await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
+      setVideos([])
     } catch (error) {
       console.error('Error fetching videos:', error)
       setVideos([])
@@ -37,9 +38,11 @@ export default function VideosModal({ course, trigger }) {
   const handleDeleteVideo = async (video) => {
     if (confirm(`Are you sure you want to delete "${video.title}"?`)) {
       try {
-        await deleteCourseVideo(video.id)
+        // Stub implementation - replace with actual database call
+        console.warn('Database functionality removed - deleteCourseVideo not implemented')
+        await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
         await fetchVideos() // Refresh the list
-        alert('Video deleted successfully!')
+        alert('Video would have been deleted!')
       } catch (error) {
         console.error('Error deleting video:', error)
         alert('Error deleting video. Please try again.')

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { BarChart3, TrendingUp, Users, DollarSign } from 'lucide-react'
-import { getAnalyticsData, getMonthlyRevenueTrends, getMonthlyStudentAcquisition, getTopPerformingPackages } from '@/lib/database'
 
 export default function Analytics() {
   const [loading, setLoading] = useState(true)
@@ -20,17 +19,37 @@ export default function Analytics() {
       setLoading(true)
       setError(null)
       
-      const [analytics, revenue, students, packages] = await Promise.all([
-        getAnalyticsData(),
-        getMonthlyRevenueTrends(),
-        getMonthlyStudentAcquisition(),
-        getTopPerformingPackages()
-      ])
+      // Stub implementation - replace with actual database calls
+      console.warn('Database functionality removed - analytics functions not implemented')
+      await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
       
-      setAnalyticsData(analytics)
-      setRevenueTrends(revenue)
-      setStudentAcquisition(students)
-      setTopPackages(packages)
+      // Mock data
+      setAnalyticsData({
+        revenueGrowth: 12.5,
+        studentGrowth: 8.3,
+        avgOrderValue: 45.75
+      })
+      setRevenueTrends([
+        { month: 'Jan', revenue: 12000 },
+        { month: 'Feb', revenue: 15000 },
+        { month: 'Mar', revenue: 18000 },
+        { month: 'Apr', revenue: 14000 },
+        { month: 'May', revenue: 22000 },
+        { month: 'Jun', revenue: 25000 }
+      ])
+      setStudentAcquisition([
+        { month: 'Jan', students: 120 },
+        { month: 'Feb', students: 150 },
+        { month: 'Mar', students: 180 },
+        { month: 'Apr', students: 140 },
+        { month: 'May', students: 220 },
+        { month: 'Jun', students: 250 }
+      ])
+      setTopPackages([
+        { title: 'Beginner Course Package', totalRevenue: 12500 },
+        { title: 'Advanced Course Package', totalRevenue: 9800 },
+        { title: 'Complete Bundle', totalRevenue: 7600 }
+      ])
     } catch (error) {
       console.error('Error fetching analytics data:', error)
       setError('Failed to load analytics data')

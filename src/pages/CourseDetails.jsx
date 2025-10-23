@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ArrowLeft, Edit, Play, Plus, Trash2 } from 'lucide-react'
-import { getCourses, getCourseVideos, deleteCourse, checkCourseDependencies } from '@/lib/database'
 import CourseForm from '@/components/CourseForm'
 import VideoForm from '@/components/VideoForm'
 
@@ -19,13 +18,18 @@ export default function CourseDetails() {
   const fetchCourse = async () => {
     try {
       setLoading(true)
-      const data = await getCourses()
-      const foundCourse = data?.find(c => c.id === id)
-      if (foundCourse) {
-        setCourse(foundCourse)
-      } else {
-        navigate('/courses') // Redirect if course not found
+      // Stub implementation - replace with actual database call
+      console.warn('Database functionality removed - getCourses not implemented')
+      await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
+      
+      // Mock course data
+      const mockCourse = {
+        id: id,
+        title: 'Sample Course',
+        description: 'This is a sample course description.',
+        created_at: new Date().toISOString()
       }
+      setCourse(mockCourse)
     } catch (error) {
       console.error('Error fetching course:', error)
       navigate('/courses')
@@ -37,8 +41,12 @@ export default function CourseDetails() {
   const fetchVideos = async () => {
     try {
       setVideosLoading(true)
-      const data = await getCourseVideos(id)
-      setVideos(data || [])
+      // Stub implementation - replace with actual database call
+      console.warn('Database functionality removed - getCourseVideos not implemented')
+      await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
+      
+      // Mock videos data
+      setVideos([])
     } catch (error) {
       console.error('Error fetching videos:', error)
       setVideos([])
@@ -59,22 +67,13 @@ export default function CourseDetails() {
 
   const handleDeleteCourse = async () => {
     try {
-      const dependencies = await checkCourseDependencies(id)
+      // Stub implementation - replace with actual database call
+      console.warn('Database functionality removed - checkCourseDependencies/deleteCourse not implemented')
+      await new Promise(resolve => setTimeout(resolve, 500)) // Simulate API delay
       
-      let confirmMessage = `Are you sure you want to delete "${course.title}"?`
-      
-      if (dependencies.videos > 0) {
-        confirmMessage += `\n\nThis will also delete ${dependencies.videos} associated video(s).`
-      }
-      
-      if (dependencies.packages > 0) {
-        confirmMessage += `\n\nThis course is linked to ${dependencies.packages} package(s). It will be removed from these packages.`
-      }
-      
-      if (confirm(confirmMessage)) {
-        await deleteCourse(id)
+      if (confirm(`Are you sure you want to delete this course?`)) {
         navigate('/courses')
-        alert('Course deleted successfully!')
+        alert('Course would have been deleted!')
       }
     } catch (error) {
       console.error('Error deleting course:', error)

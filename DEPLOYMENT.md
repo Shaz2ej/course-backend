@@ -66,9 +66,9 @@ cordova build android
 
 ## Database Setup
 
-### Supabase Configuration
+### Database Configuration
 
-1. **Create Tables** in Supabase SQL Editor:
+1. **Create Tables** in database SQL Editor:
 
 ```sql
 -- Enable UUID extension
@@ -202,19 +202,7 @@ netlify deploy --prod --dir=dist
 For production, create a `.env` file:
 
 ```env
-VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-```
-
-Update `src/lib/supabase.js`:
-
-```javascript
-import { createClient } from '@supabase/supabase-js'
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+# Database configuration variables would go here
 ```
 
 ## Testing
@@ -236,7 +224,7 @@ npm run preview
 
 ## Security Checklist
 
-- [ ] Enable RLS in Supabase
+- [ ] Enable RLS in database
 - [ ] Add authentication for admin access
 - [ ] Use environment variables for sensitive data
 - [ ] Implement input validation
@@ -262,7 +250,7 @@ npm run preview
    - Check for TypeScript errors
    - Verify all imports are correct
 
-2. **Supabase Connection Issues**:
+2. **Database Connection Issues**:
    - Verify URL and API key
    - Check network connectivity
    - Ensure tables exist in database
@@ -277,14 +265,14 @@ npm run preview
 For technical support:
 1. Check the README.md file
 2. Review error logs in browser console
-3. Check Supabase dashboard for database issues
+3. Check database dashboard for issues
 4. Verify all dependencies are installed correctly
 
 ## Maintenance
 
 ### Regular Tasks
 - Update dependencies monthly
-- Monitor Supabase usage and limits
+- Monitor database usage and limits
 - Backup database regularly
 - Review and update security policies
 - Monitor app performance metrics
@@ -294,4 +282,3 @@ For technical support:
 - Use semantic versioning
 - Document all changes
 - Maintain backward compatibility when possible
-
