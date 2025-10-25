@@ -1,5 +1,7 @@
 import express from 'express';
-import { db } from './firebaseAdmin.js';
+import admin from './firebaseAdmin.js';
+
+const db = admin.firestore();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
