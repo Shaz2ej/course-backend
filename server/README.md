@@ -1,3 +1,7 @@
+# course-backend
+
+Backend server for course admin panel with Firebase Admin SDK
+
 # Firebase Admin SDK Server
 
 This directory contains the backend server that uses Firebase Admin SDK for secure Firestore access.
