@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Plus, Save, X, Upload, Trash2 } from 'lucide-react'
 
@@ -126,6 +126,9 @@ export default function PackageForm({ packageData = null, onSuccess, trigger }) 
           <DialogTitle>
             {packageData ? 'Edit Package' : 'Add New Package'}
           </DialogTitle>
+          <DialogDescription>
+            {packageData ? 'Update package information' : 'Create a new package'}
+          </DialogDescription>
         </DialogHeader>
         <Tabs defaultValue="details" className="w-full">
           <TabsList className="grid w-full grid-cols-2">

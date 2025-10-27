@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "clean": "rm -rf node_modules dist server/node_modules",
     "server": "cd server && node index.js",
-    "server:dev": "cd server && nodemon index.js"
+    "server:dev": "cd server && nodemon index.js",
+    "test:firebase": "cd server && node testFirebase.js"
   },
   "dummy_cache_breaker": "1.0.1",
   "dependencies": {

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -50,6 +50,9 @@ export default function PackageDetailsModal({ package: pkg, trigger }) {
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Package Details</DialogTitle>
+            <DialogDescription>
+              Loading package information
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             {/* Loading skeleton */}
@@ -80,6 +83,9 @@ export default function PackageDetailsModal({ package: pkg, trigger }) {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Error</DialogTitle>
+            <DialogDescription>
+              Failed to load package details
+            </DialogDescription>
           </DialogHeader>
           <div className="text-center py-6">
             <p className="text-muted-foreground mb-4">{error}</p>
@@ -108,6 +114,9 @@ export default function PackageDetailsModal({ package: pkg, trigger }) {
             <Package className="h-5 w-5" />
             <span>Package Details</span>
           </DialogTitle>
+          <DialogDescription>
+            View detailed information about this package
+          </DialogDescription>
         </DialogHeader>
         
         {packageDetails && (

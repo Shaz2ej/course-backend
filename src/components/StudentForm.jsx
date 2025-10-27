@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Plus, Save, X } from 'lucide-react'
 import { createStudent, updateStudent } from '@/lib/firestoreUtils'
 
@@ -68,6 +68,9 @@ export default function StudentForm({ student = null, onSuccess, trigger }) {
           <DialogTitle>
             {student ? 'Edit Student' : 'Add New Student'}
           </DialogTitle>
+          <DialogDescription>
+            {student ? 'Update student information' : 'Create a new student record'}
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
@@ -137,4 +140,3 @@ export default function StudentForm({ student = null, onSuccess, trigger }) {
     </Dialog>
   )
 }
-

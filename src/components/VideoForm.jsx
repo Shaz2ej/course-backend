@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Plus, Save, X, AlertCircle } from 'lucide-react'
 import { createVideoInCourse, updateVideoInCourse } from '@/lib/firestoreUtils'
 
@@ -95,6 +95,9 @@ export default function VideoForm({ video = null, courseId = null, onSuccess, tr
           <DialogTitle>
             {video ? 'Edit Video' : 'Add New Video'}
           </DialogTitle>
+          <DialogDescription>
+            {video ? 'Update video information' : 'Create a new video for this course'}
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">

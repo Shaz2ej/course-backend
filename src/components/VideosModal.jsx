@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Play, Edit, Trash2, Plus } from 'lucide-react'
@@ -81,6 +81,9 @@ export default function VideosModal({ course, trigger }) {
               onSuccess={handleVideoFormSuccess}
             />
           </DialogTitle>
+          <DialogDescription>
+            View and manage videos for this course
+          </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-4">

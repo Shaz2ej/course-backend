@@ -102,6 +102,37 @@ The application connects to the following database tables:
 - A [Netlify](https://netlify.com) account
 - A deployed backend API (on Render or similar platform)
 
+## Deployment to Render
+
+### Backend Deployment
+
+1. Create a new Web Service on Render
+2. Connect your repository
+3. Set the following build and start commands:
+   - Build command: `cd server && npm install`
+   - Start command: `cd server && npm start`
+4. Add the required environment variables (see [.env.example](file:///c:/Users/xcore/Downloads/course-admin-panel/.env.example)):
+   - Firebase Admin SDK credentials with properly escaped newlines (`\n`)
+   - Any other required environment variables
+
+### Frontend Deployment
+
+1. Create a new Static Site on Render
+2. Connect your repository
+3. Set the following build settings:
+   - Build command: `npm install && npm run build`
+   - Publish directory: `dist`
+4. Add the environment variables:
+   - `REACT_APP_API_URL` = `https://your-backend-service-name.onrender.com/api`
+
+### Environment Variables for Render
+
+For proper deployment on Render, make sure to:
+
+1. Escape newlines in the `FIREBASE_PRIVATE_KEY` as `\n` (double backslash)
+2. Set the correct `REACT_APP_API_URL` to point to your backend service
+3. Use the [render.yaml](file:///c:/Users/xcore/Downloads/course-admin-panel/render.yaml) configuration file for easier deployment
+
 ### Deployment Steps
 
 1. Fork this repository to your GitHub account
@@ -149,6 +180,17 @@ The application now uses Firebase Admin SDK for secure server-side Firestore acc
 
 2. Update the service account information in `server/firebaseAdmin.js`:
    - Replace the placeholder values with your actual service account key data
+
+### Testing Firebase Configuration
+
+You can test your Firebase Admin SDK configuration using the provided test script:
+
+```bash
+# Test Firebase configuration
+pnpm run test:firebase
+```
+
+This will verify that your Firebase credentials are properly configured and can connect to your Firebase project.
 
 ### 3. Database Setup
 Create the required tables in your database project using the SQL schema provided above. You can run these commands in the database SQL editor:

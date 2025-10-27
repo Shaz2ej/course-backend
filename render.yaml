@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: course-admin-panel-backend
+    env: node
+    buildCommand: npm install
+    startCommand: npm run server
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+    domains:
+      - course-backend-sf98.onrender.com
+
+  - type: web
+    name: course-admin-panel-frontend
+    env: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: REACT_APP_API_URL
+        value: https://course-backend-sf98.onrender.com/api
+    domains:
+      - course-frontend-sf98.onrender.com

@@ -205,6 +205,30 @@ For production, create a `.env` file:
 # Database configuration variables would go here
 ```
 
+### Render Deployment Configuration
+
+For Render deployment, you need to set the following environment variables in your Render dashboard:
+
+1. **Firebase Admin SDK Variables**:
+   - `FIREBASE_TYPE`=service_account
+   - `FIREBASE_PROJECT_ID`=your-firebase-project-id
+   - `FIREBASE_PRIVATE_KEY_ID`=your-private-key-id
+   - `FIREBASE_PRIVATE_KEY`=-----BEGIN PRIVATE KEY-----\nYOUR_ESCAPED_PRIVATE_KEY_HERE\n-----END PRIVATE KEY-----\n
+   - `FIREBASE_CLIENT_EMAIL`=your-service-account-email@project-id.iam.gserviceaccount.com
+   - `FIREBASE_CLIENT_ID`=your-client-id
+   - `FIREBASE_AUTH_URI`=https://accounts.google.com/o/oauth2/auth
+   - `FIREBASE_TOKEN_URI`=https://oauth2.googleapis.com/token
+   - `FIREBASE_AUTH_PROVIDER_X509_CERT_URL`=https://www.googleapis.com/oauth2/v1/certs
+   - `FIREBASE_CLIENT_X509_CERT_URL`=https://www.googleapis.com/robot/v1/metadata/x509/your-service-account-email%40project-id.iam.gserviceaccount.com
+
+2. **Frontend API URL**:
+   - `REACT_APP_API_URL`=https://your-render-backend-url.onrender.com/api
+
+**Important Notes**:
+- Make sure to escape newlines in the `FIREBASE_PRIVATE_KEY` as `\\n` (double backslash) for Render environment variables
+- The frontend will automatically use the `REACT_APP_API_URL` if set, otherwise it will use a default based on the environment
+- Ensure your Render backend URL matches what you set in `REACT_APP_API_URL`
+
 ## Testing
 
 ### Local Testing

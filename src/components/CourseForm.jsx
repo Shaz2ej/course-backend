@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Plus, Save, X } from 'lucide-react'
 
 export default function CourseForm({ course = null, onSuccess, trigger }) {
@@ -55,6 +55,9 @@ export default function CourseForm({ course = null, onSuccess, trigger }) {
           <DialogTitle>
             {course ? 'Edit Course' : 'Add New Course'}
           </DialogTitle>
+          <DialogDescription>
+            {course ? 'Update the course details' : 'Create a new course'}
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
