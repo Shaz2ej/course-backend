@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { BarChart3, TrendingUp, Users, DollarSign } from 'lucide-react'
-import { db } from '@/lib/firebase'
-import { collection, getDocs } from 'firebase/firestore'
+import { getStudents, getPurchases, getPackages } from '@/lib/firestoreUtils'
 
 export default function Analytics() {
   const [loading, setLoading] = useState(true)
@@ -22,24 +21,23 @@ export default function Analytics() {
       setError(null)
       
       // Fetch students
-      await getDocs(collection(db, 'students'))
+      const studentsData = await getStudents()
       
       // Fetch purchases and calculate revenue
-      const purchasesSnapshot = await getDocs(collection(db, 'purchases'))
+      const purchasesData = await getPurchases()
       let totalRevenue = 0
       let totalPurchases = 0
       const monthlyRevenue = {}
       const monthlyStudents = {}
       
-      purchasesSnapshot.forEach((doc) => {
-        const purchaseData = doc.data()
+      purchasesData.forEach((purchaseData) => {
         if (purchaseData.status === 'completed') {
           totalRevenue += purchaseData.amount || 0
           totalPurchases++
           
           // Calculate monthly revenue
           if (purchaseData.purchase_date) {
-            const date = purchaseData.purchase_date.toDate ? purchaseData.purchase_date.toDate() : new Date(purchaseData.purchase_date)
+            const date = new Date(purchaseData.purchase_date)
             const monthKey = `${date.getFullYear()}-${date.getMonth() + 1}`
             monthlyRevenue[monthKey] = (monthlyRevenue[monthKey] || 0) + (purchaseData.amount || 0)
             
@@ -98,12 +96,11 @@ export default function Analytics() {
       setStudentAcquisition(studentAcquisitionData)
       
       // Fetch packages and calculate top performing ones
-      const packagesSnapshot = await getDocs(collection(db, 'packages'))
+      const packagesData = await getPackages()
       const packageRevenue = {}
       
       // Calculate revenue per package
-      purchasesSnapshot.forEach((doc) => {
-        const purchaseData = doc.data()
+      purchasesData.forEach((purchaseData) => {
         if (purchaseData.status === 'completed' && purchaseData.package_id) {
           packageRevenue[purchaseData.package_id] = (packageRevenue[purchaseData.package_id] || 0) + (purchaseData.amount || 0)
         }
@@ -111,16 +108,15 @@ export default function Analytics() {
       
       // Get package details and revenue
       const topPackagesData = []
-      for (const packageDoc of packagesSnapshot.docs) {
-        const packageData = packageDoc.data()
-        const revenue = packageRevenue[packageDoc.id] || 0
+      packagesData.forEach((packageData) => {
+        const revenue = packageRevenue[packageData.id] || 0
         if (revenue > 0) {
           topPackagesData.push({
             title: packageData.title,
             totalRevenue: revenue
           })
         }
-      }
+      })
       
       // Sort by revenue and take top 3
       topPackagesData.sort((a, b) => b.totalRevenue - a.totalRevenue)

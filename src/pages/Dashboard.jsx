@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Users, DollarSign, ShoppingCart, CreditCard } from 'lucide-react'
-import { db } from '@/lib/firebase'
-import { collection, getDocs } from 'firebase/firestore'
+import { getStudents, getPurchases, getWithdrawals } from '@/lib/firestoreUtils'
 
 export default function Dashboard() {
   const [stats, setStats] = useState({
@@ -18,16 +17,15 @@ export default function Dashboard() {
     const fetchStats = async () => {
       try {
         // Fetch students count
-        const studentsSnapshot = await getDocs(collection(db, 'students'))
-        const totalStudents = studentsSnapshot.size
+        const studentsData = await getStudents()
+        const totalStudents = studentsData.length
         
         // Fetch purchases and calculate revenue
-        const purchasesSnapshot = await getDocs(collection(db, 'purchases'))
+        const purchasesData = await getPurchases()
         let totalRevenue = 0
         let totalPurchases = 0
         
-        purchasesSnapshot.forEach((doc) => {
-          const purchaseData = doc.data()
+        purchasesData.forEach((purchaseData) => {
           if (purchaseData.status === 'completed') {
             totalRevenue += purchaseData.amount || 0
           }
@@ -35,12 +33,11 @@ export default function Dashboard() {
         })
         
         // Fetch withdrawals
-        const withdrawalsSnapshot = await getDocs(collection(db, 'withdrawals'))
-        let totalWithdrawals = withdrawalsSnapshot.size
+        const withdrawalsData = await getWithdrawals()
+        let totalWithdrawals = withdrawalsData.length
         let pendingWithdrawals = 0
         
-        withdrawalsSnapshot.forEach((doc) => {
-          const withdrawalData = doc.data()
+        withdrawalsData.forEach((withdrawalData) => {
           if (withdrawalData.status === 'pending') {
             pendingWithdrawals++
           }

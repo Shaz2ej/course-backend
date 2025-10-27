@@ -6,8 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { ArrowLeft, Edit, Play, Plus, Trash2 } from 'lucide-react'
 import CourseForm from '@/components/CourseForm'
 import VideoForm from '@/components/VideoForm'
-import { db } from '@/lib/firebase'
-import { doc, getDoc, deleteDoc, collection, getDocs } from 'firebase/firestore'
+import { getPackages, getCoursesByPackageId, getVideosByCourseId, deleteCourseFromPackage } from '@/lib/firestoreUtils'
 
 export default function CourseDetails() {
   const { id } = useParams()
@@ -22,15 +21,16 @@ export default function CourseDetails() {
       setLoading(true)
       // We need to find the course across all packages since we only have the course ID
       // In a real implementation, you might want to pass the packageId as well
-      const packagesSnapshot = await getDocs(collection(db, 'packages'))
+      const packagesData = await getPackages()
       let foundCourse = null
       let foundPackageId = null
       
-      for (const packageDoc of packagesSnapshot.docs) {
-        const courseDoc = await getDoc(doc(db, 'packages', packageDoc.id, 'courses', id))
-        if (courseDoc.exists()) {
-          foundCourse = { id: courseDoc.id, ...courseDoc.data() }
-          foundPackageId = packageDoc.id
+      for (const packageData of packagesData) {
+        const coursesData = await getCoursesByPackageId(packageData.id)
+        const courseData = coursesData.find(course => course.id === id)
+        if (courseData) {
+          foundCourse = { id: courseData.id, ...courseData }
+          foundPackageId = packageData.id
           break
         }
       }
@@ -39,7 +39,7 @@ export default function CourseDetails() {
         setCourse({
           ...foundCourse,
           packageId: foundPackageId,
-          created_at: foundCourse.created_at?.toDate ? foundCourse.created_at.toDate().toISOString() : new Date().toISOString()
+          created_at: foundCourse.created_at || new Date().toISOString()
         })
       } else {
         navigate('/courses') // Redirect if course not found
@@ -56,17 +56,13 @@ export default function CourseDetails() {
     try {
       setVideosLoading(true)
       if (course?.packageId) {
-        const videosSnapshot = await getDocs(collection(db, 'packages', course.packageId, 'courses', id, 'videos'))
-        const videosData = []
-        videosSnapshot.forEach((videoDoc) => {
-          const videoData = videoDoc.data()
-          videosData.push({
-            id: videoDoc.id,
-            ...videoData,
-            created_at: videoData.created_at?.toDate ? videoData.created_at.toDate().toISOString() : new Date().toISOString()
-          })
-        })
-        setVideos(videosData)
+        const videosData = await getVideosByCourseId(course.packageId, id)
+        const formattedVideos = videosData.map(videoData => ({
+          id: videoData.id,
+          ...videoData,
+          created_at: videoData.created_at || new Date().toISOString()
+        }))
+        setVideos(formattedVideos)
       }
     } catch (error) {
       console.error('Error fetching videos:', error)
@@ -94,7 +90,7 @@ export default function CourseDetails() {
   const handleDeleteCourse = async () => {
     try {
       if (confirm(`Are you sure you want to delete "${course.title}"?`)) {
-        await deleteDoc(doc(db, 'packages', course.packageId, 'courses', id))
+        await deleteCourseFromPackage(course.packageId, id)
         navigate('/courses')
         alert('Course deleted successfully!')
       }

@@ -4,8 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Search, Check, X } from 'lucide-react'
-import { db } from '@/lib/firebase'
-import { collection, getDocs, updateDoc, doc } from 'firebase/firestore'
+import { getWithdrawals, getStudents, updateWithdrawal } from '@/lib/firestoreUtils'
 
 export default function Withdrawals() {
   const [withdrawals, setWithdrawals] = useState([])
@@ -17,39 +16,25 @@ export default function Withdrawals() {
     const fetchWithdrawals = async () => {
       try {
         setLoading(true)
-        const withdrawalsSnapshot = await getDocs(collection(db, 'withdrawals'))
-        const withdrawalsData = []
+        const withdrawalsData = await getWithdrawals()
+        const studentsData = await getStudents()
         
-        for (const withdrawalDoc of withdrawalsSnapshot.docs) {
-          const withdrawalData = withdrawalDoc.data()
+        const withdrawalsWithDetails = withdrawalsData.map(withdrawalData => {
+          // Find related student data
+          const studentData = studentsData.find(student => student.id === withdrawalData.student_id) || null
           
-          // Fetch related student data
-          let studentData = null
-          if (withdrawalData.student_id) {
-            try {
-              const studentDoc = await getDocs(collection(db, 'students'))
-              studentDoc.forEach((doc) => {
-                if (doc.id === withdrawalData.student_id) {
-                  studentData = { id: doc.id, ...doc.data() }
-                }
-              })
-            } catch (error) {
-              console.warn('Error fetching student data:', error)
-            }
-          }
-          
-          withdrawalsData.push({
-            id: withdrawalDoc.id,
+          return {
+            id: withdrawalData.id,
             ...withdrawalData,
             students: studentData ? {
               name: studentData.name,
               email: studentData.email
             } : null,
-            created_at: withdrawalData.created_at?.toDate ? withdrawalData.created_at.toDate().toISOString() : new Date().toISOString()
-          })
-        }
+            created_at: withdrawalData.created_at || new Date().toISOString()
+          }
+        })
         
-        setWithdrawals(withdrawalsData)
+        setWithdrawals(withdrawalsWithDetails)
       } catch (error) {
         console.error('Error fetching withdrawals:', error)
         setWithdrawals([])
@@ -70,8 +55,7 @@ export default function Withdrawals() {
   const handleStatusUpdate = async (id, status) => {
     setProcessingId(id)
     try {
-      const withdrawalRef = doc(db, 'withdrawals', id)
-      await updateDoc(withdrawalRef, { status })
+      await updateWithdrawal(id, { status })
       
       setWithdrawals(prev => 
         prev.map(w => w.id === id ? { ...w, status } : w)

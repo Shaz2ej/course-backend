@@ -3,8 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Search, UserCheck, UserX } from 'lucide-react'
-import { db } from '@/lib/firebase'
-import { collection, getDocs } from 'firebase/firestore'
+import { getPurchases, getStudents, getPackages } from '@/lib/firestoreUtils'
 
 export default function Purchases() {
   const [purchases, setPurchases] = useState([])
@@ -15,60 +14,22 @@ export default function Purchases() {
     const fetchPurchases = async () => {
       try {
         setLoading(true)
-        const purchasesSnapshot = await getDocs(collection(db, 'purchases'))
-        const purchasesData = []
+        const purchasesData = await getPurchases()
+        const studentsData = await getStudents()
+        const packagesData = await getPackages()
         
-        for (const purchaseDoc of purchasesSnapshot.docs) {
-          const purchaseData = purchaseDoc.data()
+        const purchasesWithDetails = purchasesData.map(purchaseData => {
+          // Find related student data
+          const studentData = studentsData.find(student => student.id === purchaseData.student_id) || null
           
-          // Fetch related student data
-          let studentData = null
-          if (purchaseData.student_id) {
-            try {
-              const studentDoc = await getDocs(collection(db, 'students'))
-              studentDoc.forEach((doc) => {
-                if (doc.id === purchaseData.student_id) {
-                  studentData = { id: doc.id, ...doc.data() }
-                }
-              })
-            } catch (error) {
-              console.warn('Error fetching student data:', error)
-            }
-          }
+          // Find related package data
+          const packageData = packagesData.find(pkg => pkg.id === purchaseData.package_id) || null
           
-          // Fetch related package data
-          let packageData = null
-          if (purchaseData.package_id) {
-            try {
-              const packagesSnapshot = await getDocs(collection(db, 'packages'))
-              for (const packageDoc of packagesSnapshot.docs) {
-                if (packageDoc.id === purchaseData.package_id) {
-                  packageData = { id: packageDoc.id, ...packageDoc.data() }
-                  break
-                }
-              }
-            } catch (error) {
-              console.warn('Error fetching package data:', error)
-            }
-          }
+          // Find referrer data if it's a referral purchase
+          const referrerData = studentsData.find(student => student.id === purchaseData.affiliate_id) || null
           
-          // Fetch referrer data if it's a referral purchase
-          let referrerData = null
-          if (purchaseData.affiliate_id) {
-            try {
-              const studentDoc = await getDocs(collection(db, 'students'))
-              studentDoc.forEach((doc) => {
-                if (doc.id === purchaseData.affiliate_id) {
-                  referrerData = { id: doc.id, ...doc.data() }
-                }
-              })
-            } catch (error) {
-              console.warn('Error fetching referrer data:', error)
-            }
-          }
-          
-          purchasesData.push({
-            id: purchaseDoc.id,
+          return {
+            id: purchaseData.id,
             ...purchaseData,
             students: studentData ? {
               name: studentData.name,
@@ -82,12 +43,12 @@ export default function Purchases() {
               name: referrerData.name,
               email: referrerData.email
             } : null,
-            created_at: purchaseData.created_at?.toDate ? purchaseData.created_at.toDate().toISOString() : new Date().toISOString(),
-            purchase_date: purchaseData.purchase_date?.toDate ? purchaseData.purchase_date.toDate().toISOString() : new Date().toISOString()
-          })
-        }
+            created_at: purchaseData.created_at || new Date().toISOString(),
+            purchase_date: purchaseData.purchase_date || new Date().toISOString()
+          }
+        })
         
-        setPurchases(purchasesData)
+        setPurchases(purchasesWithDetails)
       } catch (error) {
         console.error('Error fetching purchases:', error)
         setPurchases([])

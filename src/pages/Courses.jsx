@@ -8,8 +8,7 @@ import { Search, Plus, Edit, Trash2, Play, Eye, Video } from 'lucide-react'
 import CourseForm from '@/components/CourseForm'
 import VideoForm from '@/components/VideoForm'
 import VideosModal from '@/components/VideosModal'
-import { db } from '@/lib/firebase'
-import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore'
+import { getPackages, getCoursesByPackageId, deleteCourseFromPackage } from '@/lib/firestoreUtils'
 
 export default function Courses() {
   const navigate = useNavigate()
@@ -21,19 +20,18 @@ export default function Courses() {
     try {
       setLoading(true)
       // Fetch all packages first
-      const packagesSnapshot = await getDocs(collection(db, 'packages'))
+      const packagesData = await getPackages()
       const allCourses = []
       
       // For each package, fetch its courses subcollection
-      for (const packageDoc of packagesSnapshot.docs) {
-        const coursesSnapshot = await getDocs(collection(db, 'packages', packageDoc.id, 'courses'))
-        coursesSnapshot.forEach((courseDoc) => {
-          const courseData = courseDoc.data()
+      for (const packageData of packagesData) {
+        const coursesData = await getCoursesByPackageId(packageData.id)
+        coursesData.forEach((courseData) => {
           allCourses.push({
-            id: courseDoc.id,
-            packageId: packageDoc.id,
+            id: courseData.id,
+            packageId: packageData.id,
             ...courseData,
-            created_at: courseData.created_at?.toDate ? courseData.created_at.toDate().toISOString() : new Date().toISOString()
+            created_at: courseData.created_at || new Date().toISOString()
           })
         })
       }
@@ -58,7 +56,7 @@ export default function Courses() {
   const handleDeleteCourse = async (course) => {
     try {
       if (confirm(`Are you sure you want to delete "${course.title}"?`)) {
-        await deleteDoc(doc(db, 'packages', course.packageId, 'courses', course.id))
+        await deleteCourseFromPackage(course.packageId, course.id)
         await fetchCourses() // Refresh the list
         alert('Course deleted successfully!')
       }

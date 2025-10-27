@@ -3,8 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Search } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
-import { db } from '@/lib/firebase'
-import { collection, getDocs, doc, getDoc } from 'firebase/firestore'
+import { getPurchases, getStudents, getPackages } from '@/lib/firestoreUtils'
 
 export default function PackageReferralCodes() {
   const [referralCodes, setReferralCodes] = useState([])
@@ -17,68 +16,35 @@ export default function PackageReferralCodes() {
         setLoading(true)
         // In a real implementation, you might have a separate collection for referral codes
         // For now, we'll generate this data from purchases that have affiliate information
-        const purchasesSnapshot = await getDocs(collection(db, 'purchases'))
-        const referralCodesData = []
+        const purchasesData = await getPurchases()
+        const studentsData = await getStudents()
+        const packagesData = await getPackages()
         
-        for (const purchaseDoc of purchasesSnapshot.docs) {
-          const purchaseData = purchaseDoc.data()
-          
-          // Only include purchases with affiliate information
-          if (purchaseData.affiliate_id && purchaseData.status === 'completed') {
-            // Fetch student data
-            let studentData = null
-            if (purchaseData.student_id) {
-              try {
-                const studentDoc = await getDoc(doc(db, 'students', purchaseData.student_id))
-                if (studentDoc.exists()) {
-                  studentData = { id: studentDoc.id, ...studentDoc.data() }
-                }
-              } catch (error) {
-                console.warn('Error fetching student data:', error)
-              }
-            }
+        const referralCodesData = purchasesData
+          .filter(purchaseData => purchaseData.affiliate_id && purchaseData.status === 'completed')
+          .map(purchaseData => {
+            // Find student data
+            const studentData = studentsData.find(student => student.id === purchaseData.student_id) || null
             
-            // Fetch package data
-            let packageData = null
-            if (purchaseData.package_id) {
-              try {
-                const packagesSnapshot = await getDocs(collection(db, 'packages'))
-                for (const packageDoc of packagesSnapshot.docs) {
-                  if (packageDoc.id === purchaseData.package_id) {
-                    packageData = { id: packageDoc.id, ...packageDoc.data() }
-                    break
-                  }
-                }
-              } catch (error) {
-                console.warn('Error fetching package data:', error)
-              }
-            }
+            // Find package data
+            const packageData = packagesData.find(pkg => pkg.id === purchaseData.package_id) || null
             
-            // Fetch referrer data
-            let referrerData = null
-            if (purchaseData.affiliate_id) {
-              try {
-                const referrerDoc = await getDoc(doc(db, 'students', purchaseData.affiliate_id))
-                if (referrerDoc.exists()) {
-                  referrerData = { id: referrerDoc.id, ...referrerDoc.data() }
-                }
-              } catch (error) {
-                console.warn('Error fetching referrer data:', error)
-              }
-            }
+            // Find referrer data
+            const referrerData = studentsData.find(student => student.id === purchaseData.affiliate_id) || null
             
             if (studentData && packageData && referrerData) {
-              referralCodesData.push({
-                id: purchaseDoc.id,
+              return {
+                id: purchaseData.id,
                 student_name: studentData.name,
                 student_email: studentData.email,
                 package_name: packageData.title,
                 referral_code: referrerData.referral_code,
-                created_at: purchaseData.purchase_date?.toDate ? purchaseData.purchase_date.toDate().toISOString() : new Date().toISOString()
-              })
+                created_at: purchaseData.purchase_date || new Date().toISOString()
+              }
             }
-          }
-        }
+            return null
+          })
+          .filter(Boolean) // Remove null values
         
         setReferralCodes(referralCodesData)
       } catch (error) {

@@ -6,8 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Play, Edit, Trash2, Plus } from 'lucide-react'
 import VideoForm from './VideoForm'
 import VideoPlayer from './VideoPlayer'
-import { db } from '@/lib/firebase'
-import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore'
+import { getVideosByCourseId, deleteVideoFromCourse } from '@/lib/firestoreUtils'
 
 export default function VideosModal({ course, trigger }) {
   const [open, setOpen] = useState(false)
@@ -19,17 +18,13 @@ export default function VideosModal({ course, trigger }) {
     
     try {
       setLoading(true)
-      const videosSnapshot = await getDocs(collection(db, 'packages', course.packageId, 'courses', course.id, 'videos'))
-      const videosData = []
-      videosSnapshot.forEach((videoDoc) => {
-        const videoData = videoDoc.data()
-        videosData.push({
-          id: videoDoc.id,
-          ...videoData,
-          created_at: videoData.created_at?.toDate ? videoData.created_at.toDate().toISOString() : new Date().toISOString()
-        })
-      })
-      setVideos(videosData)
+      const videosData = await getVideosByCourseId(course.packageId, course.id)
+      const formattedVideos = videosData.map(videoData => ({
+        id: videoData.id,
+        ...videoData,
+        created_at: videoData.created_at || new Date().toISOString()
+      }))
+      setVideos(formattedVideos)
     } catch (error) {
       console.error('Error fetching videos:', error)
       setVideos([])
@@ -47,7 +42,7 @@ export default function VideosModal({ course, trigger }) {
   const handleDeleteVideo = async (video) => {
     if (confirm(`Are you sure you want to delete "${video.title}"?`)) {
       try {
-        await deleteDoc(doc(db, 'packages', course.packageId, 'courses', course.id, 'videos', video.id))
+        await deleteVideoFromCourse(course.packageId, course.id, video.id)
         await fetchVideos() // Refresh the list
         alert('Video deleted successfully!')
       } catch (error) {

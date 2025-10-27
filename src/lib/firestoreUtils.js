@@ -1,8 +1,17 @@
-import { studentsApi, packagesApi, coursesApi, videosApi, purchasesApi } from './apiClient';
+import { studentsApi, packagesApi, coursesApi, videosApi, purchasesApi, withdrawalsApi } from './apiClient';
 
 // Utility function to convert timestamp to JavaScript Date
 export const convertTimestamp = (timestamp) => {
-  return timestamp;
+  // If it's already a date string, return as is
+  if (typeof timestamp === 'string') {
+    return timestamp;
+  }
+  // If it's a timestamp object, convert to ISO string
+  if (timestamp && typeof timestamp === 'object' && timestamp.seconds) {
+    return new Date(timestamp.seconds * 1000).toISOString();
+  }
+  // Default to current date
+  return new Date().toISOString();
 };
 
 // Students CRUD operations
@@ -195,6 +204,25 @@ export const updatePurchase = async (id, updates) => {
     return await purchasesApi.update(id, updates);
   } catch (error) {
     console.error('Error updating purchase:', error);
+    throw error;
+  }
+};
+
+// Withdrawals CRUD operations
+export const getWithdrawals = async () => {
+  try {
+    return await withdrawalsApi.getAll();
+  } catch (error) {
+    console.error('Error fetching withdrawals:', error);
+    throw error;
+  }
+};
+
+export const updateWithdrawal = async (id, updates) => {
+  try {
+    return await withdrawalsApi.update(id, updates);
+  } catch (error) {
+    console.error('Error updating withdrawal:', error);
     throw error;
   }
 };

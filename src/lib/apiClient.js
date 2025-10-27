@@ -1,5 +1,5 @@
 // API client for communicating with the backend server
-const API_BASE_URL = 'http://localhost:3001/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
 
 // Helper function to handle API requests
 const apiRequest = async (endpoint, options = {}) => {
@@ -97,6 +97,15 @@ export const purchasesApi = {
     body: JSON.stringify(data),
   }),
   update: (id, data) => apiRequest(`/purchases/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  }),
+};
+
+// Withdrawals API
+export const withdrawalsApi = {
+  getAll: () => apiRequest('/withdrawals'),
+  update: (id, data) => apiRequest(`/withdrawals/${id}`, {
     method: 'PUT',
     body: JSON.stringify(data),
   }),

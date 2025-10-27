@@ -6,8 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { ArrowLeft, Search, Plus, Edit, Trash2, Play } from 'lucide-react'
 import VideoForm from '@/components/VideoForm'
-import { db } from '@/lib/firebase'
-import { doc, getDoc, deleteDoc, collection, getDocs } from 'firebase/firestore'
+import { getPackages, getCoursesByPackageId, getVideosByCourseId, deleteVideoFromCourse } from '@/lib/firestoreUtils'
 
 export default function CourseVideos() {
   const { id } = useParams()
@@ -22,15 +21,16 @@ export default function CourseVideos() {
       setLoading(true)
       
       // We need to find the course and its package to fetch videos
-      const packagesSnapshot = await getDocs(collection(db, 'packages'))
+      const packagesData = await getPackages()
       let foundCourse = null
       let foundPackageId = null
       
-      for (const packageDoc of packagesSnapshot.docs) {
-        const courseDoc = await getDoc(doc(db, 'packages', packageDoc.id, 'courses', id))
-        if (courseDoc.exists()) {
-          foundCourse = { id: courseDoc.id, ...courseDoc.data() }
-          foundPackageId = packageDoc.id
+      for (const packageData of packagesData) {
+        const coursesData = await getCoursesByPackageId(packageData.id)
+        const courseData = coursesData.find(course => course.id === id)
+        if (courseData) {
+          foundCourse = { id: courseData.id, ...courseData }
+          foundPackageId = packageData.id
           break
         }
       }
@@ -43,21 +43,17 @@ export default function CourseVideos() {
         ...foundCourse,
         packageId: foundPackageId,
         title: foundCourse.title,
-        created_at: foundCourse.created_at?.toDate ? foundCourse.created_at.toDate().toISOString() : new Date().toISOString()
+        created_at: foundCourse.created_at || new Date().toISOString()
       })
       
       // Fetch course videos
-      const videosSnapshot = await getDocs(collection(db, 'packages', foundPackageId, 'courses', id, 'videos'))
-      const videosData = []
-      videosSnapshot.forEach((videoDoc) => {
-        const videoData = videoDoc.data()
-        videosData.push({
-          id: videoDoc.id,
-          ...videoData,
-          created_at: videoData.created_at?.toDate ? videoData.created_at.toDate().toISOString() : new Date().toISOString()
-        })
-      })
-      setVideos(videosData)
+      const videosData = await getVideosByCourseId(foundPackageId, id)
+      const formattedVideos = videosData.map(videoData => ({
+        id: videoData.id,
+        ...videoData,
+        created_at: videoData.created_at || new Date().toISOString()
+      }))
+      setVideos(formattedVideos)
     } catch (error) {
       console.error('Error fetching course data:', error)
       alert('Error loading course data. Please try again.')
@@ -80,7 +76,7 @@ export default function CourseVideos() {
   const handleDeleteVideo = async (video) => {
     if (confirm(`Are you sure you want to delete "${video.title}"?`)) {
       try {
-        await deleteDoc(doc(db, 'packages', course.packageId, 'courses', id, 'videos', video.id))
+        await deleteVideoFromCourse(course.packageId, id, video.id)
         await fetchCourseAndVideos() // Refresh the list
         alert('Video deleted successfully!')
       } catch (error) {

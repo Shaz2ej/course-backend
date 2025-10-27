@@ -5,8 +5,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Plus, Save, X, AlertCircle } from 'lucide-react'
-import { db } from '@/lib/firebase'
-import { collection, addDoc, updateDoc, doc, Timestamp } from 'firebase/firestore'
+import { createVideoInCourse, updateVideoInCourse } from '@/lib/firestoreUtils'
 
 export default function VideoForm({ video = null, courseId = null, onSuccess, trigger, packageId }) {
   const [open, setOpen] = useState(false)
@@ -49,17 +48,14 @@ export default function VideoForm({ video = null, courseId = null, onSuccess, tr
         description: formData.description || null,
         video_embed: formData.video_embed,
         course_id: formData.course_id,
-        created_at: Timestamp.now()
       }
 
       if (video) {
         // Update existing video
-        const videoRef = doc(db, 'packages', packageId, 'courses', formData.course_id, 'videos', video.id)
-        await updateDoc(videoRef, videoData)
+        await updateVideoInCourse(packageId, formData.course_id, video.id, videoData)
       } else {
         // Create new video
-        const videosRef = collection(db, 'packages', packageId, 'courses', formData.course_id, 'videos')
-        await addDoc(videosRef, videoData)
+        await createVideoInCourse(packageId, formData.course_id, videoData)
       }
 
       setOpen(false)

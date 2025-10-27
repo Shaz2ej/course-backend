@@ -96,6 +96,33 @@ The application connects to the following database tables:
 - `total_leads` (Integer)
 - `total_commission` (Numeric)
 
+## Deployment to Netlify
+
+### Prerequisites
+- A [Netlify](https://netlify.com) account
+- A deployed backend API (on Render or similar platform)
+
+### Deployment Steps
+
+1. Fork this repository to your GitHub account
+2. Log in to Netlify and click "New site from Git"
+3. Select your forked repository
+4. Configure the build settings:
+   - Build command: `npm run build`
+   - Publish directory: `dist`
+5. In the "Environment variables" section, add:
+   - `REACT_APP_API_URL` = `https://your-backend.onrender.com/api` (your deployed backend URL)
+   - Firebase configuration variables (if needed)
+6. Click "Deploy site"
+
+### Environment Variables
+For local development, copy [.env.example](file:///c:/Users/xcore/Downloads/course-admin-panel/.env.example) to [.env](file:///c:/Users/xcore/Downloads/course-admin-panel/.env) and update the values:
+```bash
+REACT_APP_API_URL=http://localhost:3001/api
+```
+
+For production deployment, make sure to set the `REACT_APP_API_URL` to your live backend URL.
+
 ## Setup Instructions
 
 ### Prerequisites
