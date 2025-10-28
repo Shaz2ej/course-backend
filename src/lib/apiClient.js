@@ -1,5 +1,5 @@
 // API client for communicating with the backend server
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
 // Helper function to handle API requests
 const apiRequest = async (endpoint, options = {}) => {
