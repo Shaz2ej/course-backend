@@ -1,4 +1,5 @@
 // API client for communicating with the backend server
+// Updated to ensure Netlify build works correctly
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
 // Helper function to handle API requests
