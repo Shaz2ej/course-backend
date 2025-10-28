@@ -1,4 +1,5 @@
 // src/lib/firebase.js
+// This file is required for Vite build process
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
