@@ -5,6 +5,8 @@ import './App.css'
 import './compatibility.css'
 import App from './App.jsx'
 
+// ⚠️ WARNING: If changing React version, update package.json dependencies accordingly.
+
 // Override console.warn for CSS compatibility warnings
 if (typeof window !== 'undefined') {
   const originalWarn = console.warn;

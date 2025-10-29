@@ -1,0 +1,14 @@
+// ⚠️ WARNING: These are basic security rules for development only.
+// For production, implement proper authentication and authorization rules.
+// See Firebase documentation for best practices on securing your data.
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow read/write access to all documents for authenticated users
+    // ⚠️ WARNING: This is insecure for production use!
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}

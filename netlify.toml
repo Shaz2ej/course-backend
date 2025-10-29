@@ -1,3 +1,4 @@
+# ⚠️ WARNING: If changing Node version, update everywhere: .nvmrc, package.json, Netlify settings.
 [build]
   command = "pnpm install && pnpm run build"
   publish = "dist"

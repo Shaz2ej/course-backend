@@ -1,0 +1,7 @@
+// ⚠️ WARNING: This is a generated Firebase configuration file.
+// Update with your actual Firebase project settings before deploying to production.
+{
+  "firestore": {
+    "rules": "firestore.rules"
+  }
+}

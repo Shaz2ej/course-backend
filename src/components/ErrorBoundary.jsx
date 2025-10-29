@@ -1,5 +1,7 @@
 import { Component } from 'react';
 
+// ⚠️ WARNING: ErrorBoundary component for catching runtime issues.
+// ⚠️ WARNING: Never publish debug info to public deployments.
 // Error Boundary component to catch and handle JavaScript errors in React components
 // Prevents the entire app from crashing when a component throws an error
 // Displays a fallback UI when an error occurs

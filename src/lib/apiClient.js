@@ -1,3 +1,5 @@
+// ⚠️ WARNING: API client for communicating with the backend server.
+// ⚠️ WARNING: Ensure VITE_API_URL environment variable is set in production.
 // API client for communicating with the backend server
 // Updated to ensure Netlify build works correctly
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
