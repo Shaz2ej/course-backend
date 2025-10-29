@@ -10,12 +10,14 @@ import CourseDetails from './pages/CourseDetails'
 import CourseVideos from './pages/CourseVideos'
 import Analytics from './pages/Analytics'
 import PackageReferralCodes from './pages/PackageReferralCodes'
+import ErrorBoundary from './components/ErrorBoundary'
 
 function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<Layout />}>
+      <ErrorBoundary>
+        <Routes>
+          <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
           <Route path="students" element={<Students />} />
           <Route path="purchases" element={<Purchases />} />
@@ -26,8 +28,9 @@ function App() {
           <Route path="courses/:id/videos" element={<CourseVideos />} />
           <Route path="analytics" element={<Analytics />} />
           <Route path="package-referral-codes" element={<PackageReferralCodes />} />
-        </Route>
-      </Routes>
+          </Route>
+        </Routes>
+      </ErrorBoundary>
     </Router>
   )
 }
