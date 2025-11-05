@@ -6,6 +6,9 @@
 // DO NOT import this file in any component
 // All Firebase operations should use the backend API through apiClient.js
 
+// Add a console warning if this file is imported
+console.warn('⚠️ WARNING: src/lib/firebase.js is a placeholder file and should not be imported in production code.');
+
 // Export null values to prevent import errors
 export const auth = null;
 export const db = null;

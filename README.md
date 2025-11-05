@@ -371,7 +371,7 @@ For support and questions, please contact the development team or create an issu
 If you encounter a Netlify build error like:
 
 ```
-[vite:load-fallback] Could not load /opt/build/repo/src/lib/firebase (imported by src/pages/Courses.jsx): ENOENT: no such file
+[vite:load-fallback] Could not load /opt/build/repo/src/lib/firebase (imported by src/pages/Dashboard.jsx): ENOENT: no such file
 ```
 
 This is typically caused by Netlify's build cache containing references to old Firebase imports that have been removed. To fix this:
@@ -387,5 +387,10 @@ This is typically caused by Netlify's build cache containing references to old F
    ```bash
    npm run clear-netlify-cache
    ```
+
+3. If the issue persists:
+   - Check that all files are committed to Git
+   - Verify that no components are importing src/lib/firebase
+   - Ensure the placeholder firebase.js file exists
 
 This will force Netlify to do a clean build without cached modules that might be referencing the old Firebase imports.

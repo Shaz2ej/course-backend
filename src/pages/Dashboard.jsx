@@ -1,3 +1,5 @@
+// Updated to use backend API instead of direct Firebase calls
+// This change is to trigger a new build on Netlify and ensure no Firebase imports remain
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Users, DollarSign, ShoppingCart, CreditCard } from 'lucide-react'

@@ -8,6 +8,19 @@
 [functions]
   included_files = ["src/**/*", "public/**/*"]
 
+# Add ignore command to force clean builds
+[build.processing]
+  skip_processing = false
+
+# Environment variables for build
+[build.environment]
+  # Force reinstall of dependencies
+  NODE_OPTIONS = "--max_old_space_size=4096"
+  # Disable npm cache
+  NPM_CONFIG_CACHE = "/tmp/.npm"
+  # Clear pnpm cache
+  PNPM_CACHE_FOLDER = "/tmp/.pnpm-store"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
@@ -15,10 +28,3 @@
 
 [template.environment]
   REACT_APP_API_URL = "Your API URL (e.g., https://your-backend.onrender.com/api)"
-
-# Force clean builds to prevent cached module issues
-[build.environment]
-  # Clear cache on each build
-  NETLIFY_BUILD_BASE = "/opt/buildhome/.netlify-build"
-  # Force reinstall of dependencies
-  NODE_OPTIONS = "--max_old_space_size=4096"
