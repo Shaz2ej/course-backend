@@ -363,3 +363,29 @@ This project is licensed under the MIT License.
 ## Support
 
 For support and questions, please contact the development team or create an issue in the repository.
+
+## Troubleshooting
+
+### Netlify Deployment Error: Firebase Import Issue
+
+If you encounter a Netlify build error like:
+
+```
+[vite:load-fallback] Could not load /opt/build/repo/src/lib/firebase (imported by src/pages/Courses.jsx): ENOENT: no such file
+```
+
+This is typically caused by Netlify's build cache containing references to old Firebase imports that have been removed. To fix this:
+
+1. Clear Netlify's build cache:
+   - Go to your Netlify dashboard
+   - Select your site
+   - Go to "Deploys" tab
+   - Click "Trigger deploy" dropdown
+   - Select "Clear cache and deploy site"
+
+2. Alternatively, run the cache clearing script locally:
+   ```bash
+   npm run clear-netlify-cache
+   ```
+
+This will force Netlify to do a clean build without cached modules that might be referencing the old Firebase imports.
